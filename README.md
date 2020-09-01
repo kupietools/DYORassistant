@@ -6,7 +6,7 @@ VERSION ALPHA 2020.08.25
 
 ## I. Origins
 
-Website  [http://DEXTools.io](http://DEXTools.io) have built a great information explorer 
+The folks behind the website  [http://DEXTools.io](http://DEXTools.io) have built a great information explorer 
 for Uniswap. However, I found that as I explored the information it gave me, I had to do far too 
 much clicking around to other websites to do my own research on the coins listed. I wanted a quicker 
 way to gather information and determine which coins might be worth investing in, and more importantly, 
