@@ -1,4 +1,7 @@
 # DYORassistant (formerly "DEXTassistant")
+
+#THIS REPO IS STILL EXPERIMENTAL. PLEASE CONTINUE TO USE DEXTASSISTANT FOR THE TIME BEING
+
 An independently developed userscript bringing new UI features and embedded research tools to popular DEX- &amp; DeFi-related websites to give you an edge and help avoid scams. Follow [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects) on Telegram for announcements.
 VERSION ALPHA 2020.08.25
 
