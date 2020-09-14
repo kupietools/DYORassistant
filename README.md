@@ -1,9 +1,6 @@
 # DYORassistant (formerly "DEXTassistant")
 
-#THIS REPO IS STILL EXPERIMENTAL. PLEASE CONTINUE TO USE DEXTASSISTANT FOR THE TIME BEING
-
-An independently developed userscript bringing new UI features and embedded research tools to popular DEX- &amp; DeFi-related websites to give you an edge and help avoid scams. Follow [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects) on Telegram for announcements.
-VERSION ALPHA 2020.08.25
+An independently developed userscript bringing new UI features and embedded research tools to popular DEX- & DeFi-related websites, to give you an edge and help avoid scams. Follow [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects) on Telegram for announcements.
 
 # BACKGROUND 
 
@@ -110,8 +107,16 @@ it here, but I haven't checked.
 
 ## Features
 
-At this moment, still only DEXTools.io is supported. This adds a few cosmetic changes to the DEXTools.io Pool Explorer 
-and Pair Explorer pages. You will notice them right away:
+Global enhancemensts:
+
+1.) In any table that has a header row, columns are now sortable.
+
+2.) Ethereum addresses in table columns can be filtered to show only the rows for that address. 
+
+3.) Any links to Etherscan.io now also have a button added to look that address up on Zerion. Ethereum addresses
+are color coded to make repeated transactions from the same address more noticeable in tables.
+
+DEXTools.io enhancements:
 
 1.) The most prominent addition is a new icon under the Pool Explorer's Actions column, which opens a 
 "research assistant" popup that will allow you to view data from other websites pertaining to the token Name, 
@@ -126,13 +131,6 @@ with a "poop" emoji.
 3.) Rows in the the Pool Explorer are color-coded to indicate liquidity adds, removes, and new pools. 100% 
 liquidity removals are now labeled as "rugpull" instead of just "remove", to make sure you know to feel 
 extra-bitter.
-
-4.) Columns are sortable on both the Pool and Pair explorers buy clicking on the column headings.
-
-5.) In the Pair Explorer page, wallet addresses that have more than one transaction in the list are now color-
-coded to make it easier to spot scammy trades, where one address buys and sells just to generate activity. Next 
-to these addresses, there is also now a "ƒ" button to filter the list to show all the transactions for just that 
-address, and a "Z" button that takes you to the Zerion overview for that wallet.
 
 6.) DEXTools "Dark mode" is now supported, because I was too lazy to attempt any real work tonight. 
 
@@ -158,4 +156,12 @@ Oh, yeah, and, be extra skeptical if the liquidity pool is less than 1000 ETH. I
 1.) Right now the list filtering and sorting only acts on existing rows. As new transactions or pools appear, they 
 come in at the top, exactly as if the list wasn't filtered or sorted. I'll get around to it. Hey, it's an open 
 source script, you don't like it, fix it yourself.
+
+# FUTURE PLANS
+
+In keeping with this tool's mission of helping beginning and small traders get a leg up, in an upcoming version this userscript 
+may begin asking for permission to check your wallet balances. If you hold enough wealth to qualify for the premium-level
+subscriptions to some popular websites, such as holding 20k DEXT for DEXTools 2nd-tier subscription or holding enough TRND to 
+qualify for Trendering's exclusive 300-member telegram, you may be prevented from further use of this script. If you wish to 
+avoid these restrictions you may wish not to upgrade the script. 
 
