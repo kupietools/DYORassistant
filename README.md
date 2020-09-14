@@ -1,6 +1,8 @@
 # DYORassistant (formerly "DEXTassistant")
 
-An independently developed userscript bringing new UI features and embedded research tools to popular DEX- & DeFi-related websites, to give you an edge and help avoid scams. Follow [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects) on Telegram for announcements.
+An independently developed userscript bringing new UI features and embedded research tools to popular DEX- & 
+DeFi-related websites, to give you an edge and help avoid scams. Follow 
+[http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects) on Telegram for announcements.
 
 # BACKGROUND 
 
