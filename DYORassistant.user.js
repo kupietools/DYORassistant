@@ -2,7 +2,7 @@
 // @name         DYORassistant
 // @namespace    https://apopheniapays.com/
 // @version      ALPHA-2020.90.14t
-// @description  Adds some research tools and visual niceties to DeFi utilities and sites (currently only Dextools.io, more soon). Does not interfere with existing functionality, just adds cosmetics for user convenience.
+// @description  Adds some research tools and visual niceties to popular DeFi utilities and sites. Does not interfere with existing functionality, just adds cosmetics for user convenience.
 // @author       @ApopheniaPays
 // @updateURL    https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
 // @downloadURL  https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
