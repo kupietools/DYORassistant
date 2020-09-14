@@ -160,10 +160,8 @@ come in at the top, exactly as if the list wasn't filtered or sorted. I'll get a
 source script, you don't like it, fix it yourself.
 
 # FUTURE PLANS
-
 In keeping with this tool's mission of helping beginning and small traders get a leg up, in an upcoming version this userscript 
-may begin asking for permission to check your wallet balances. If you hold enough wealth to qualify for the premium-level
-subscriptions to some popular websites, such as holding 20k DEXT for DEXTools 2nd-tier subscription or holding enough TRND to 
-qualify for Trendering's exclusive 300-member telegram, you may be prevented from further use of this script. If you wish to 
-avoid these restrictions you may wish not to upgrade the script. 
-
+may begin asking for read-only permission to connect to your wallet (exactly as all dApps currently do.) If you hold enough wealth to 
+qualify for the premium-level subscriptions to some popular websites, such as holding 20k DEXT for DEXTools 2nd-tier subscription 
+or holding enough TRND to qualify for Trendering's exclusive 300-member telegram, you may be prevented from further use of this 
+script. If you wish to avoid these restrictions you may wish not to upgrade the script. 
