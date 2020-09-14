@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         DYORassistant
 // @namespace    https://apopheniapays.com/
-// @version      ALPHA-2020.90.01
-// @description  Adds some research tools and visual niceties to Dextools.io. Does not interfere with existing functionality, just adds cosmetics for user convenience.
+// @version      ALPHA-2020.90.04t
+// @description  Adds some research tools and visual niceties to DeFi utilities and sites (currently only Dextools.io, more soon). Does not interfere with existing functionality, just adds cosmetics for user convenience.
 // @author       @ApopheniaPays
 // @updateURL    https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
 // @downloadURL  https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
-// @match        https://www.dextools.io/app/*
+// @match        *://*/*
 // @match        http://www.dextools.io/app/*
 // @match        https://dextools.io/app/*
 // @match        http://dextools.io/app/*
@@ -15,12 +15,13 @@
 // @connect      github.com
 // @connect      githubusercontent.com
 // @run-at       document-start
-// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAD4ElEQVRIDZ2UbUxbVRzGT1lxTgjGwG1ZjItZdE582fywOHyNX0zUDxo/GRMX50IkKkoJMspAOjZqbymyLo6ZoBZh0NHX3dvSDeyYWFihLS2UseJm0fFiSq2tE9aO18fcyshABtWb3OQ8//M8v/u/595zCEnwomSmDwU0+06C9gRtEkkSRbOgaHYgwURiNqGcFS2BkSFj3kostZGrpFlI8upBCk9p7jms79mqMIc2imw4D+AZe3i2o8gZhNjqS98mYx/jl+tA0SbxhuG1DABSFxcxYLGcw7e0FE7LGQDoi3sLGk6n0yzuk2nuXSu7bg1A1zGlEhUVRyCVSlF6qATHv6jm4IZ3da6dpKgZArlJsS5k9SSAaiNjhKigAKOjo3C73QgEAigrLcMFgw4TwLOk+PQhrusMaeuO1fk76th0bFL2uQwOlwN2ux1WqxWOXgeUSiXqak9yXX8QD5e2gJIxhjuCVk9EQpFgzr4c5Ivy4XS54Pf70T/Qj9z3c9Ft6+bAL8YzuXWVmQozMmjmpdWMNfWN6Wiw7NNSqJubUSIW48SXtSguFqOx4RQHlawIFTbNC6pMwytqawkAd4+PTUzTFTQH6R0fG9fbOrsWOQHAy2UAvHrrAQ9Usa+Tj+pBDjatv2lUvsiDLrsDalUjB6oBkDU/vwCWNcP6/fkogKkfOn7E13XfADNReMMzb9ePTI21DAciazW6XHuoxlo3PDiEE4oaOByOWQDR7Oy94Bq9K3kTdu/KQnIyP64f3bkD0ehMbLirMxb0OCGy+f/5qMu0pcHmI5pH9jb2YKjfizajCTk5B+IADnrr5vP54PF4y5qrP/3E47j+1w3sUnVHidiQvppL+BLteQ7s7nXNslojtxQL4tz9uJ9KxTZhGuqPKeILra5V4qms7chI24T9b7wMRENgrk2VE1EDhAr2+AowJWNfIWUavKZ1H/zJ4/m1TWfgIAf+AETB0HVfODI1GAXkzOS0MAR8HIvd9E4Ewj5uJ9om/9zOwZLKtSfjJ6Dc9PAynKJZf/JhPXarLg65epxzvvZWFHWOeEh+Y/tz6r7fs5ucgdRKxkby6pktEl3Hnu/sEy+0eMKZ1WcdJE91LuUz7ZWt1a2jS0drp6CKeZJQcvPzmQrzCClssuxRXRzxeTzwmBnUeIMR8t5XV3gSnZdXrhlMOWr8JbPK9Fta5ZlrPIn2EinXDmw5qr8qkJsmBDQ7SdHsIEWz7RTNXqXkzCeESC7wCQGPaz8ACH7u64O+Uc0txZvLr/RfBgCPSCRJKyIAUi5funyz3dL2/8EriLeJhYUFem5uLgLg37/Obb6Nhn8Dna1ooIakiNYAAAAASUVORK5CYII=
+// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAATCAYAAACUef2IAAAD8UlEQVQ4EY3SfUyVVRzA8ac/dGplq5w1c/3R2z+ZFDmbzrbWRlvGyEA0tQDJF5gwmth4URMu1wsMJQiQGyjilbcrLxdNAq6Nii4ZKPiGi5dAYEmgQPf+LlyBrnzbQzDAjPFsZ+f5nd/5fc5zznMU5YEnKV8sa7NFXE/YZJ3BIR4mp7yrt8uSSpssrRfxzRLxPC2y3ijiXiCyIlUk6qJ05DH4zAPUVJhukBr/SGHzCRspTdA7Cu1dPbQ7wcUOym0rqxuFA0YhqEj4uETIsAjD94Rah/QkDT4EP2aQGp+Dwo4wG5daoe/PZuLCggjc5k1y9D66bnfxvgOUdisvNwpBeYJ7plDdIoDQZBNqZBpOd/eirJNSExAh7Am3UlELv12uZKOHGwcOHCQqOprdgQGkBO6k7VY7C/pHUBzCvE7B9bhw6uK/cK9DGHUInQ7pMQ8NLVOSjGLxjhcCkwStwcHYfTsazRdoNFpyc3JIS03DbDaz3W87lfqvyRyB58uFF68Kpj7B0S/k9gk5dwXDXaGoX0i5I4NKvFF8XfIFt0IhvQXab9QSF6vjfNl5dDod6enpGAwG/P13kHsqif422LtH+CpKoE2IGRKUG4LSJCjNE/01KR3/c6F5EvrKcSG/E65afuCN11wI+TyESnMlZwrPUGA0ssFjPfW131H2MwRrhdhIYVupoNwVlNaJ9ruwsFGuTV0HRVHWptkKtM1QnJ3JTr/PKM41sNXbCw/3D/H09ORsyWmaOmDLXjsB4cJRjbC4QVD+mEKVmzK8q23giRmwGpxu47I++QiJ8UcYBfQn8sk4ph8/d4AQ3TAlVdDdAsEXxlDarFPbvyH4tMqa/6DqABC8PywSS/lZCvvgp3sqBz9WXaC6+hJOoOlmHdXmfHpw4jMK6wYgE/jyljXwoegEfEif9g3x0dEMjo5hH4MP3nNDXXPJk4sJDdnFwgXzxuNN77wN94awDvxFV6kJGNk0GxxVbCzm00/8WOP6OqtWrhhHVPhh7aXly3nusUfRp2eoG/OfFdZGaamvqycuPm4GtvrNleRmJ/LWqpmLeXl6qWgHMH9WODYmlvKy8jtAleWXGpIPR2BIjcEmdnodcH/gb75NO8rh/RFUVFSqqMVuty/9X1RNAFEJsQmcM53rn4g3mKzQMAgnCyAkyEbY92PsA7qgAPhoVnAyqcIxh2IoyFVreFod351t2/LUUSE0Qcg/JMw3j99b02TNnHpAo9PoMBWZ1Gu8bLLIt9Sm3ZwghCcKi65LO/DIZG5OPZCgix6H1S+ecW4BKXL92Wwha9j6wpyw6ZOcTqe7pdoiVxqu9ACPT8/VWeyvZv5q3zh9bLb3fwBYLlKabrfnIAAAAABJRU5ErkJggg==
 // @require      https://code.jquery.com/jquery-3.3.1.min.js
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @require      https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js
 // @require      https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js
 // @require      https://piyolab.github.io/sushiether/web3.js/libs/web3.js_v1.0.0-beta.33/web3.min.js
+// @resource     FONTAWESOME  https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css
 // @license      MIT
 // ==/UserScript==
 
@@ -130,7 +131,7 @@ coded to make it easier to spot scammy trades, where one address buys and sells 
 to these addresses, there is also now a "ƒ" button to filter the list to show all the transactions for just that
 address, and a "Z" button that takes you to the Zerion overview for that wallet.
 
-6.) DEXTools "Dark mode" is now supported, because I was too lazy to attempt any real work tonight.
+6.) DEXTools "Dark mode" is now supported, because I was too lazy to do any real work tonight.
 
 7.) Rather than rely on the various browser plugins' hinky auto-update mechanism, the script adds an unobtrusive
 "update available" link to the footer of the screen after a new version has been pushed to this repo, for
@@ -204,13 +205,22 @@ var ethplorerkey="freekey";
 /**/
 
 
-var thisHistory= `
+var thisHistory= encodeURIComponent(`
 
 VERSION HISTORY
+===============
+
+2020.09.13t - transitional version while I work on code refactoring for greater portability.
+Finally fix button for Reasearch Assistant popover not appearing on pair page. Get Zerion links,
+address coloring, and table sorting working on all sites instead of just DEXTools. Add footer
+popovers for credits and version history. Color rows that contain cells labeled "buy" or "sell".
+Add classes and functions to remove additions if element that triggered their creation is gone.
+Spiffy new icon.
+
 2020.09.02 - add popover Research Assistant menu to Pair Explorer page, fixes to contact info
 indication, preparation for moving repository and begin rebrand to DYORa, titles to DYORa and
-version links, show version history when click on version link, begin prepping to show new 
-version history before upgrade
+version links, show version history when click on version link, begin prepping to show new
+version history before upgrade, rename functions to avoid potential conflicts [old version]
 
 2020.08.28 - add visual higlight and prominent indication when there's contact info on pair page,
 add hover effects and pointer cursor for all clickable elements, color code pair explorer page
@@ -223,9 +233,8 @@ Pair Explorer filter icon to match default Pool Explorer one.
 2020.08.25 - Alpha development. Color pool rows for added liquidity or new pools, popover menu
 of extra research tools, token icons from Trustwallet repo, mark 100% removes as "rugpull",
 integrate custom crypto search engine results into Research Assistant popover, integrate live
-CryptoCompare pricing info, soooooperfast table sorting, color-coding and
-//                    filtering hex addresses
-`;
+CryptoCompare pricing info, soooooperfast table sorting, color-coding and filtering hex addresses
+`);
 
 
 this.$ = this.jQuery = jQuery.noConflict(true);
@@ -235,20 +244,19 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
              //Hey ho, let's go
 
-             var currentVersion="ALPHA-2020.90.01";
+             var currentVersion="ALPHA-2020.90.04t";
 
              var newVersionAvail="";
              var newVersionHistory="";
-
+             var newVersionURL = "https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js";
              GM.xmlHttpRequest({
                  method: "GET",
-                 url: "https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js",
+                 url:newVersionURL,
                  onload: function(scrptTxt) {
                      var versionMtch = scrptTxt.response.match(/\/\/\s+@version\s+(.+)/i);
-                     newVersionHistory = scrptTxt.response.match(/var thisHistory= \`([\s\S]+?)\`/i);
-                     console.log ("nvh ",newVersionHistory);
+                     newVersionHistory = encodeURIComponent(scrptTxt.response.match(/var thisHistory= \`([\s\S]+?)\`/i)[1]);
                      if (versionMtch  &&  versionMtch.length > 1) {
-                         newVersionAvail = versionMtch[1];
+                         newVersionAvail = encodeURIComponent(versionMtch[1]);
                          if(newVersionAvail!=currentVersion) {waitForKeyElements('span#newVersion',addNewVersion);}
                      };
                  }
@@ -256,7 +264,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
 
              function addNewVersion (jNode) {
-                 jNode.html('<a title="update DYORassistant" href="https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js" class="AP-DAJS-element">v '+newVersionAvail.replace(/ALPHA/gi,'')+' available</a>');
+                 jNode.html('<a title="update DYORassistant" href="'+newVersionURL+'" class="AP_DAJS_element">v '+newVersionAvail.replace(/ALPHA-/gi,'')+' available</a>');
                  //yeah, it's hinky. This runs asynchronously so there's two different places this can happen: here, or synchronously down below.
              }
 
@@ -276,14 +284,17 @@ this.$ = this.jQuery = jQuery.noConflict(true);
              // of six characters.
              function intToARGB(i) {
                  var hex = ((i>>24)&0xFF).toString(16) +
-                     ((i>>16)&0xFF).toString(16) +
-                     ((i>>8)&0xFF).toString(16) +
-                     (i&0xFF).toString(16);
+                     ((i>>16)&0xAE).toString(16) +
+                     ((i>>8)&0xAE).toString(16) +
+                     (i&0xAE).toString(16);
                  // Sometimes the string returned will be too short so we
                  // add zeros to pad it out, which later get removed if
                  // the length is greater than six.
                  hex += '000000';
-                 return hex.substring(0, 6);
+                 var theReturn = hex.substring(0, 6).replace("b","3").replace("c","5").replace("d","7").replace("e","9").replace("f","a"); //make a little darker
+
+                 //   theReturn = (((theReturn & 0x7E7E7E) >> 1) | (col & 0x808080)) ;//darken it
+                 return theReturn;
              }
 
              // Extend the string type to allow converting to hex for quick access.
@@ -291,99 +302,184 @@ this.$ = this.jQuery = jQuery.noConflict(true);
                  return intToARGB(hashCode(this));
              }
 
-             var allPagesScripts=`
-<script id="AP-DAJS-allPageScripts">
-function displayHistory(){
-win=window.open("", 'DYORa Version History', \'width=700, height=700, right=24, top=24, scrollbars, resizable\');
-    win.document.write('<html><body><pre>'+\``+thisHistory+`\`+'</pre></body></html>');return false;
-
-}
+             window.thisHistory=thisHistory;
 
 
 
-function sortTable(n,tableId) {
-    var table = document.getElementById(tableId);
-    document.getElementById("AP-DAJS-th"+tableId+n).classList.toggle(".sorting");
-    window.setTimeout(sortTableMain(n,tableId), 100);
-    return;}
+             function quoteFunction(funcCall){
+                 //from https://coursesweb.net/javascript/replace-javascript-variable-name-from-string-with-value_cs
+                 var str=funcCall.toString();
 
-function sortTableMain(n,tableId) {
-    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById(tableId);
-    try { document.getElementById("AP-DAJS-th"+tableId+table.getAttribute("lastSortedBy")).textContent="⇅";
-         document.getElementById("AP-DAJS-th"+tableId+table.getAttribute("lastSortedBy")).classList.toggle("text-info");
-        } catch {}
-            table.setAttribute("lastSortedBy",n);
+                 // JavaScript & jQuery Courses - https://coursesweb.net/javascript/
+                 str = str.replace(/\$\{(.*?)\}/gi, function(a,b) {
+                     // if token is an array item, else, is object property, or variable
+                     if(b.match(/[a-z0-9_]+\[[a-z0-9_]+\]/i)) {
+                         var arritm = b.match(/([a-z0-9_]+)\[([a-z0-9_]+)\]/i);      // gets an array with the matched items
+                         return window[arritm[1]][arritm[2]];
+                     }
+                     else {
+                         var voitm = b.split('.');
+                         return (voitm.length == 2) ? window[voitm[0]][voitm[1]] : window[voitm[0]];
+                     }
+                 });
 
-    switching = true;
-    // Set the sorting direction to ascending:
-    dir = "asc";
-    /* Make a loop that will continue until no switching has been done: */
-    while (switching) {
-        // Start by saying: no switching is done:
-        switching = false;
-        rows = table.rows;
-        /* Loop through all table rows (except the
+                 return str;
+             }
+
+
+             function addJS_Node (text, s_URL, funcToRun) {
+                 var D                                   = document;
+                 var scriptNode                          = D.createElement ('script');
+                 scriptNode.type                         = "text/javascript";
+                 if (text)       scriptNode.textContent  = text;
+                 if (s_URL)      scriptNode.src          = s_URL;
+                 if (funcToRun)  scriptNode.textContent  = quoteFunction(funcToRun);
+
+                 var targ = D.getElementsByTagName ('head')[0] || D.body || D.documentElement;
+                 targ.appendChild (scriptNode);
+             }
+
+
+             /********************** Functions to include in pages **********************/
+             function AP_DAJS_displayHistory(){
+                 win=window.open("", 'DYORa Version History', 'width=700, height=700, right=24, top=24, scrollbars, resizable');
+                 win.document.write('<html><body><pre>'+decodeURIComponent(`${thisHistory}`)+'</pre></body></html>');return false;
+
+             }
+             addJS_Node(null, null, AP_DAJS_displayHistory);
+
+             function AP_DAJS_upgradeVersion(){
+                 win=window.open("", 'DYORa Version Upgrade', 'width=700, height=700, right=24, top=24, scrollbars, resizable');
+                 win.document.write('<html><body>Installed version: '+decodeURIComponent(`${currentVersion}`)+'<br>Available version: '+decodeURIComponent(`${newVersionAvail}`)+'< a href="'+decodeURIComponent(`${newVersionAvail}`)+'">click to install upgrade</a> (<a href="'+decodeURIComponent(`${newVersionAvail}.replace(/\/raw\//i,'/blob/')`)+'">source</a>)<br><small>After upgrading, please close this window and refresh the browser page you came from.</small><p><pre>'+decodeURIComponent(`${thisHistory}`)+'</pre></body></html>');return false;
+
+             }
+
+             addJS_Node(null, null, AP_DAJS_upgradeVersion);
+
+
+             function AP_DAJS_sortTable(n,tableId) {
+                 var table = document.getElementById(tableId);
+                 document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle(".sorting");
+                 window.setTimeout(AP_DAJS_sortTableMain(n,tableId), 100);
+                 return;}
+
+             addJS_Node(null, null, AP_DAJS_sortTable);
+
+
+
+             function AP_DAJS_sortTableMain(n,tableId) {
+                 var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                 table = document.getElementById(tableId);
+                 try { document.getElementById("AP_DAJS_th"+tableId+table.getAttribute("lastSortedBy")).textContent="⇅";
+                      document.getElementById("AP_DAJS_th"+tableId+table.getAttribute("lastSortedBy")).classList.toggle("text-info");
+                     } catch(e) {};
+                 table.setAttribute("lastSortedBy",n);
+
+
+                 switching = true;
+                 // Set the sorting direction to ascending:
+                 dir = "asc";
+                 /* Make a loop that will continue until no switching has been done: */
+                 while (switching) {
+                     // Start by saying: no switching is done:
+                     switching = false;
+                     rows = table.rows;
+                     /* Loop through all table rows (except the
     first, which contains table headers): */
-        for (i = 1; i < (rows.length - 1); i++) {
-            // Start by saying there should be no switching:
-            shouldSwitch = false;
-            /* Get the two elements you want to compare,
+                     for (i = 1; i < (rows.length - 1); i++) {
+                         // Start by saying there should be no switching:
+                         shouldSwitch = false;
+                         /* Get the two elements you want to compare,
       one from current row and one from the next: */
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
-            /* Check if the two rows should switch place,
+                         x = rows[i].getElementsByTagName("TD")[n];
+                         y = rows[i + 1].getElementsByTagName("TD")[n];
+                         /* Check if the two rows should switch place,
       based on the direction, asc or desc: */
-            xValue=isNaN(x.getAttribute('AP-DAJS-valueCalc'))?x.getAttribute('AP-DAJS-valueCalc') :(+x.getAttribute('AP-DAJS-valueCalc') );
-            yValue=isNaN(y.getAttribute('AP-DAJS-valueCalc'))?y.getAttribute('AP-DAJS-valueCalc') :(+y.getAttribute('AP-DAJS-valueCalc') );
-            if (dir == "asc") {
-                if (xValue < yValue) {
-                    // If so, mark as a switch and break the loop:
-                    shouldSwitch = true;
-                    break;
-                }
-            } else if (dir == "desc") {
-                if (xValue > yValue) {
-                    // If so, mark as a switch and break the loop:
-                    shouldSwitch = true;
-                    break;
-                }
-            }
-        }
-        if (shouldSwitch) {
-            /* If a switch has been marked, make the switch
+                         xValue=isNaN(x.getAttribute('AP_DAJS_valueCalc'))?x.getAttribute('AP_DAJS_valueCalc') :(+x.getAttribute('AP_DAJS_valueCalc') );
+                         yValue=isNaN(y.getAttribute('AP_DAJS_valueCalc'))?y.getAttribute('AP_DAJS_valueCalc') :(+y.getAttribute('AP_DAJS_valueCalc') );
+                         if (dir == "asc") {
+                             if (xValue < yValue) {
+                                 // If so, mark as a switch and break the loop:
+                                 shouldSwitch = true;
+                                 break;
+                             }
+                         } else if (dir == "desc") {
+                             if (xValue > yValue) {
+                                 // If so, mark as a switch and break the loop:
+                                 shouldSwitch = true;
+                                 break;
+                             }
+                         }
+                     }
+                     if (shouldSwitch) {
+                         /* If a switch has been marked, make the switch
       and mark that a switch has been done: */
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-            // Each time a switch is done, increase this count by 1:
-            switchcount ++;
-        } else {
-            /* If no switching has been done AND the direction is "asc",
+                         rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                         switching = true;
+                         // Each time a switch is done, increase this count by 1:
+                         switchcount ++;
+                     } else {
+                         /* If no switching has been done AND the direction is "asc",
       set the direction to "desc" and run the while loop again. */
-            if (switchcount == 0 && dir == "asc") {
-                dir = "desc";
-                switching = true;
-            }
-        }
-    }
-    document.getElementById("AP-DAJS-th"+tableId+n).textContent=(dir=="desc"?"↓":"↑");
-    document.getElementById("AP-DAJS-th"+tableId+n).classList.toggle("text-info");
-    document.getElementById("AP-DAJS-th"+tableId+n).classList.toggle(".sorting");
-}
-function previewToggle (thisCounter,url,section){
-    if(document.getElementById('AP-DAJS-previewResults'+thisCounter).style.display=='block'
-       && document.getElementById('AP-DAJS-results'+thisCounter).src==decodeURIComponent(url))
-    {document.getElementById('AP-DAJS-previewResults'+thisCounter).style.display='none';
-     document.getElementById('AP-DAJS-floaterlink'+section+thisCounter).innerHTML='&gt;🔎'}
-    else
-    {document.getElementById('AP-DAJS-results'+thisCounter).src=decodeURIComponent(url);
-     document.getElementById('AP-DAJS-previewResults'+thisCounter).style.display='block';
-     document.getElementById('AP-DAJS-floaterlink'+section+thisCounter).innerHTML='&lt;🔍'}
-}
+                         if (switchcount == 0 && dir == "asc") {
+                             dir = "desc";
+                             switching = true;
+                         }
+                     }
+                 }
+                 document.getElementById("AP_DAJS_th"+tableId+n).textContent=(dir=="desc"?"↓":"↑");
+                 document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle("text-info");
+                 document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle(".sorting");
+             }
 
-</script>
+             addJS_Node(null, null, AP_DAJS_sortTableMain);
 
-`;
+             function AP_DAJS_previewToggle (thisCounter,url,section){
+                 if(document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display=='block'
+                    && document.getElementById('AP_DAJS_results'+thisCounter).src==decodeURIComponent(url))
+                 {document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display='none';
+                  document.getElementById('AP_DAJS_floaterlink'+section+thisCounter).innerHTML='&gt;🔎'}
+                 else
+                 {document.getElementById('AP_DAJS_results'+thisCounter).src=decodeURIComponent(url);
+                  document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display='block';
+                  document.getElementById('AP_DAJS_floaterlink'+section+thisCounter).innerHTML='&lt;🔍'}
+             }
+             addJS_Node(null, null, AP_DAJS_previewToggle);
+
+             function AP_DAJS_filterFunction(filterOn,tableId,theColor) {
+                 console.log("filterOn",filterOn);
+                 var filterAddr=filterOn.parentNode.getAttribute("ap_dajs_valuecalc")
+                 var thisIndex = Array.from(filterOn.parentNode.parentNode.children).indexOf(filterOn.parentNode);
+                 console.log("filterAddr",filterAddr);
+                 if (typeof window.filterState === 'undefined') {window.filterState="";}
+                 var filter= (window.filterState=="")?filterAddr:"";
+                 window.filterState=filter;
+                 var  table, tr, td, i, txtValue;
+                 table = document.getElementById(tableId);
+
+
+                 tr = table.getElementsByTagName("tr");
+                 var hTD = table.getElementsByTagName("th")[thisIndex];
+
+                 for (i = 0; i < tr.length; i++) {
+                     td = tr[i].getElementsByTagName("td")[thisIndex];
+                     if (td) {
+                         txtValue = td.getAttribute("ap_dajs_valuecalc"); //td.textContent || td.innerText;
+                         console.log("txtValue",txtValue);
+
+                         if (txtValue.indexOf(filter) > -1 || filter=="" ) {
+                             tr[i].style.display = "";
+                         } else {
+                             tr[i].style.display = "none";
+                         }
+                     }
+                 }
+                 if (filter == "") {hTD.innerHTML = hTD.getAttribute("oldText");} else {hTD.setAttribute("oldText",hTD.innerHTML);hTD.innerHTML = 'Maker <span style="color:#'+theColor+' !important" class="AP_DAJS_element">'+filter+' only</span>';}
+             }
+             addJS_Node(null, null, AP_DAJS_filterFunction);
+             /********************** end Functions to include in pages **********************/
+
+
 
              function timeStringToSeconds (timeString) {
 
@@ -397,19 +493,59 @@ function previewToggle (thisCounter,url,section){
                  return(seconds);
              }
 
-             waitForKeyElements ( "th", prepareTable);
-             waitForKeyElements ("td.ng-tns-c46-2,td.ng-tns-c49-2", setTDvalue);
+             waitForKeyElements ( "thead>tr>th", prepareTable);
+             waitForKeyElements ("td", setTDvalue);
              waitForKeyElements ( ".circle", addLogo);
              waitForKeyElements ( "span.copyright.ml-auto.my-auto.mr-2", addDisclaimer);
+             waitForKeyElements ( "a[href*='/address/0x']", prepareEtherscanLink);
+             waitForKeyElements ( ".AP_DAJS_dependentElement:not(.AP_DAJS_dependency+.AP_DAJS_dependentElement)",removeDependency)
+
+             function removeDependency(jNode) {
+                 jNode.remove();
+             }
+
+             function prepareEtherscanLink(jNode) {
+                 var thisNode = jNode;
+                 var thisHREF = thisNode.attr('href');
+                 var theHex= /0\x[0-9a-f]+/i.exec(thisHREF)[0];
+                 try {var theTest=theHex.length;
+                      thisNode.attr('style','color: #'+theHex.toHexColour()+' !important');
+                      try { if( thisNode.closest("TD").length) {
+                          var thisIndex=thisNode.closest("TD").index();
+                          var theTable=thisNode.closest("table").attr('id');
+                          var theDupeCount=$("table#"+theTable+" a[href='"+thisHREF+"']").length;
+
+                          if (theDupeCount>1){
+                              thisNode.parent().prepend('<i title="filter on this address" class="AP_DAJS_element AP_DAJS_clickable filterbutton fa fa-filter pools-icon-warning ng-tns-c46-2" onclick="AP_DAJS_filterFunction(this,\''+thisNode.closest("table").attr("id")+'\',\''+theHex.toHexColour()+'\')"><sup>['+theDupeCount+']</sup></i>'); }
+                      }} catch (e) {console.log("ERROR - theHex",theHex);console.log(e);}
+                      //style="background:#'+theHex.toHexColour()+' !important"
+                      //  jNode.closest("td").next().attr('style','background: #'+theHex.toHexColsorttour()+' !important');
+
+                      thisNode.after('<a title="Zerion wallet overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_popupItem AP_DAJS_popupWin"'
+                                     +' href="https://app.zerion.io/'+theHex+'/overview">'
+                                     +' <div class="AP_DAJS_element backImg zeriImg hide"></div></a>');
+                      thisNode.addClass('AP_DAJS_dependency');
+
+                     } catch(e) {}
+
+             }
 
              function setTDvalue(jNode) {
                  var rightNow = (new Date().getTime()/1000 );
 
+                 var thisTD=jNode.clone();
+                 thisTD.find(".AP_DAJS_element").remove();
 
-
-                 jNode.attr("AP-DAJS-valueCalc",
-                            ( jNode.text()!="" && jNode.text().replace(/[ 0-9hdmsHDMS]*/g,"")=="" )?timeStringToSeconds(jNode.text()):(isNaN(jNode.text().replace(/[$,]/g,"")))?jNode.text().toLowerCase():parseFloat(jNode.text().replace(/[$,]/g,""))
+                 jNode.attr("AP_DAJS_valueCalc",
+                            ( thisTD.text()!="" && thisTD.text().replace(/[ 0-9hdmsHDMS]*/g,"")=="" )?timeStringToSeconds(thisTD.text()):(isNaN(thisTD.text().replace(/[$,]/g,"")))?thisTD.text().toLowerCase():parseFloat(thisTD.text().replace(/[$,]/g,""))
                            ); /*convert relative times to epoch time so don't have to worry about cell relative value updating, as it does. */
+
+
+
+                 /* now some special general formatting */
+                 if (jNode.attr("AP_DAJS_valueCalc")=="sell") {makeRed(jNode);}
+                 if (jNode.attr("AP_DAJS_valueCalc")=="buy") {makeGreen(jNode);}
+
                  return true;
                  /* jNode.on('DOMSubtreeModified', setTDvalue(jNode)); NOPE! Infinit loop */
              }
@@ -417,9 +553,9 @@ function previewToggle (thisCounter,url,section){
              function prepareTable (jNode) {
                  if (!jNode.closest("table").attr("id"))
                  {  jNode.closest("table").attr("id",Math.floor(Math.random() * Math.floor(Math.random() * Date.now())));}
-                 jNode.addClass("AP-DAJS-clickable");
-                 jNode.attr("onclick","sortTable("+jNode.index()+","+jNode.closest("table").attr("id")+")");
-                 jNode.append('<span class="AP-DAJS-element DAsorter" id="AP-DAJS-th'+jNode.closest("table").attr("id")+jNode.index()+'">⇅</span>');
+                 jNode.addClass("AP_DAJS_clickable");
+                 jNode.attr("onclick","AP_DAJS_sortTable("+jNode.index()+","+jNode.closest("table").attr("id")+")");
+                 jNode.append('<span class="AP_DAJS_element DAsorter" id="AP_DAJS_th'+jNode.closest("table").attr("id")+jNode.index()+'">⇅</span>');
              }
 
 
@@ -462,9 +598,9 @@ function previewToggle (thisCounter,url,section){
                  if(thisPage=="pool"){
                      /************************ pool page functions ************************/
                      $(document).ready(function(){
-                         $(document.head).append(allPagesScripts+`
-<script id="AP-DAJS-poolScripts">
-    async function DAgetCCPrice(symbol,identifier) {
+                         $(document.head).append(`
+<script id="AP_DAJS_poolScripts">
+    async function AP_DAJS_getCCPrice(symbol,identifier) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "https://min-api.cryptocompare.com/data/price?fsym="+symbol+"&tsyms=USD,ETH", true);
     xhr.onload = function () {
@@ -473,12 +609,6 @@ function previewToggle (thisCounter,url,section){
     };
     xhr.send();
 
-}
-
-function resizeIFrameToFitContent( iFrame ) {
-
-    iFrame.width  = iFrame.contentWindow.document.body.scrollWidth;
-    iFrame.height = iFrame.contentWindow.document.body.scrollHeight;
 }
 
 
@@ -492,7 +622,7 @@ function resizeIFrameToFitContent( iFrame ) {
                      waitForKeyElements ( "td:nth-child(9) > a.ng-tns-c46-2.badge.badge-danger", rugPull);
                      //            waitForKeyElements ( "td:nth-child(5) > span", ccAdd);
 
-                     waitForKeyElements ( "#AP-DAJS-popupframe[src='']", togglePreview);
+                     waitForKeyElements ( "#AP_DAJS_popupframe[src='']", togglePreview);
                      /************************ end pool page functions ************************/
                  }
                  else
@@ -500,39 +630,17 @@ function resizeIFrameToFitContent( iFrame ) {
                      /************************ pair page functions ************************/
                      $(document).ready(function(){
                          $(document.head).append(
-                             allPagesScripts+`
-<script id="AP-DAJS-pairScripts">
+                             `
+<script id="AP_DAJS_pairScripts">
 var filterState="";
 
-function filterFunction(filterAddr,tableId,theColor) {
-    var filter= (filterState=="")?filterAddr:"";
-    filterState=filter;
-    var  table, tr, td, i, txtValue;
-    table = document.getElementById(tableId);
 
-
-    tr = table.getElementsByTagName("tr");
-    var hTD = table.getElementsByTagName("th")[6];
-
-    for (i = 0; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[6];
-        if (td) {
-            txtValue = td.textContent || td.innerText;
-            if (txtValue.indexOf(filter) > -1 || filter=="" ) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }
-    }
-    if (filter == "") {hTD.innerHTML = hTD.getAttribute("oldText");} else {hTD.setAttribute("oldText",hTD.innerHTML);hTD.innerHTML = 'Maker <span style="color:#'+theColor+' !important" class="AP-DAJS-element">'+filter+' only</span>';}
-}
 </script>
 `);
                      });
-                     waitForKeyElements ( "td.ng-tns-c49-2:nth-child(7)", colorCodeHex);
+                     //  waitForKeyElements ( "td.ng-tns-c49-2:nth-child(7)", colorCodeHex);
                      waitForKeyElements ( "h3.page-title>a.ng-tns-c49-2",hiliteExtraInfo); //nth-child(2) didn't work because 2nd child isn't 'a'!
-                     waitForKeyElements ( "h3.page-title",addGoog);
+                     waitForKeyElements ( "h3.page-title + small.ng-tns-c56-2",addGoog);
                      /************************ end pair page functions ************************/
                  }
 
@@ -551,232 +659,290 @@ function filterFunction(filterAddr,tableId,theColor) {
 
              }
 
-             function colorCodeHex(jNode) {
+             function colorCodeHexOLD(jNode) { /* no longer used
                  var thisNode = jNode.children("a").first();
                  var theHex= thisNode.text().replace(/ /g,'');
                  if( thisNode.closest("table").attr("id")==""){thisNode.closest("table").attr('id','AddressesTable');}
                  if(jNode.next("td:has(>a.ng-tns-c49-2>span.badge-secondary)").length)
-                 { /* next cell indicates multiple transactions from this address */
+                 { /~ next cell indicates multiple transactions from this address ~/
                      thisNode.attr('style','color: #'+theHex.toHexColour()+' !important');
-                     thisNode.parent().prepend('<i title="filter on this address" class="AP-DAJS-element AP-DAJS-clickable filterbutton fa fa-filter pools-icon-warning ng-tns-c46-2" onclick="filterFunction(\''+theHex+'\',\''+thisNode.closest("table").attr("id")+'\',\''+theHex.toHexColour()+'\')"></i>');
+                     thisNode.parent().prepend('<i title="filter on this address" class="AP_DAJS_element AP_DAJS_clickable filterbutton fa fa-filter pools-icon-warning ng-tns-c46-2" onclick="AP_DAJS_filterFunction(this,\''+thisNode.closest("table").attr("id")+'\',\''+theHex.toHexColour()+'\')"></i>');
                      //style="background:#'+theHex.toHexColour()+' !important"
-                     //  jNode.closest("td").next().attr('style','background: #'+theHex.toHexColour()+' !important');
+                     //  jNode.closest("td").next().attr('style','background: #'+theHex.toHexColsorttour()+' !important');
                  }
-                 thisNode.parent().append('<a title="Zerion wallet overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
+                 thisNode.parent().append('<a title="Zerion wallet overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
                                           +' href="https://app.zerion.io/'+theHex+'/overview">'
-                                          +' <div class="AP-DAJS-element backImg zeriImg hide"></div></a>');
+                                          +' <div class="AP_DAJS_element AP_DAJS_zerionFromAddress backImg zeriImg hide"></div></a>'); */
              }
 
-             function togglePreview (jNode) {$("#AP-DAJS-preview").toggle();}
+
+
+             function togglePreview (jNode) {$("#AP_DAJS_preview").toggle();}
 
              function addLogo (jNode)
              {jNode.addClass("gearImg").css({"background-repeat":"no-repeat","background-position":"center"})};
 
-             function rugPull(jNode) { if (jNode.text()=="-100%") { //var rugHTML='<span class="AP-DAJS-element text-warning badge-danger">RUGPULL</span> ';
+             function rugPull(jNode) { if (jNode.text()=="-100%") { //var rugHTML='<span class="AP_DAJS_element text-warning badge-danger">RUGPULL</span> ';
                  jNode.addClass("badge-dark");
                  jNode.parent().prevAll().eq(4).children(":first").addClass("badge-dark");
                  jNode.parent().prevAll().eq(4).children(":first").text("RUGPULL");
              } }
 
-             function addLink(jNode) { var creditHTML='<div style="float:right" class="AP-DAJS-element"><div class="AP-DAJS-element sirImg backImg"></div> <a href="#" class="AP-DAJS-element">DYORassistant Installed</a></div>';
+             function addLink(jNode) { var creditHTML='<div style="float:right" class="AP_DAJS_element"><div class="AP_DAJS_element sirImg backImg"></div> <a href="#" class="AP_DAJS_element">DYORassistant Installed</a></div>';
                                       jNode.parent().prepend(creditHTML);
                                      }
-             function addDisclaimer(jNode) { var creditHTML='<div style="margin:auto 0 auto auto;" class="AP-DAJS-element text-muted bottomdiv"><a href="#" title="Go to DYORassistant Github repo" class="AP-DAJS-element">DYORassistant</a><div class="AP-DAJS-element sirImg backImg" onclick="javascript:this.classList.toggle(\'anim\');"></div> <a title="See Version History" href="javascript:displayHistory()">'+currentVersion+'</a> installed <span id="newVersion" class="AP-DAJS-element"></span></div>';
+             function addDisclaimer(jNode) { var creditHTML='<div style="margin:auto 0 auto auto;" class="AP_DAJS_element text-muted bottomdiv">'
+             +'<a id="creditlink" data-toggle="popover" data-container="body" '
+             +'data-boundary="viewport" data-placement="top" type="button" data-html="true" href=""'
+             +'class="AP_DAJS_element">DYORassistant</a><div class="AP_DAJS_element sirImg backImg" '
+             +'onclick="javascript:this.classList.toggle(\'anim\');"></div> <a id="historylink" '
+             +'data-toggle="popover" data-container="body" data-boundary="viewport" data-placement="top"'
+             +'type="button" data-html="true" class="AP_DAJS_element" href="javascript:AP_DAJS_displayHistory()">'
+             +currentVersion+'</a> installed <span id="newVersion" class="AP_DAJS_element"></span>'
+             +'</div><div id="creditPopover" class="popover"></div>';
                                             jNode.before(creditHTML);
                                             $("div.navbar-toggler").on('click', 'div.navbar-toggler', function (e) {
 
                                             });
-                                           }
-             function makeRed(jNode){ jNode.parent().parent().addClass("redBkgd");
-                                     jNode.parent().next().addClass("redBkgd");
+
+                                            /******** show credits ******/
+                                            var showCreditsFunction=function() { var _this = this;
+                                                                                $("a#creditlink,a#upgradelink,a#historylink").not(this).popover('hide');
+                                                                                $(this).popover("show");//$('#frame'+thisCounter).src='https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22';
+                                                                                $(".popover")
+                                                                                    .on("mouseleave", function() {
+                                                                                    $(_this).popover('hide');
+                                                                                });
+                                                                               }
+                                            $("a#creditlink").popover({ trigger: "manual",
+                                                                       html: true,
+                                                                       animation: false,
+                                                                       sanitize:false,
+                                                                       content: function() { return 'by <a href="https://twitter.com/ApopheniaPays" target="_blank">@ApopheniaPays</a>.<p><a href="https://github.com/ApopheniaPays/dyorassistant" target="_blank">Github repo</a> - <a href="mailto:DYORfeedback@apopheniapays.com">email</a> - <a href="https://t.me/apopheniaprojects" target="_blank">Telegram Announcements</a>';} /* prevent duplicate elements */
+                                                                      })
+                                                .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
+                                                .on("click",showCreditsFunction ).on("mouseleave", function() {
+                                                var _this = this;
+                                                setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
+                                                                                                         }
+                                                                      }, 300);
+                                            });
+                                            /******** end credits *******/
+             $("a#historylink").popover({ trigger: "manual",
+                                         html: true,
+                                         animation: false,
+                                         sanitize:false,
+                                         content: function() { return "<textarea rows='10' columns='100'>"+decodeURIComponent(thisHistory)+"</textarea>";} /* prevent duplicate elements */
+                                        })
+                 .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
+                 .on("click",showCreditsFunction ).on("mouseleave", function() {
+                 var _this = this;
+                 setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
+                                                                          }
+                                       }, 300);
+             });
+             /******** end historylink *******/
+}
+             function makeRed(jNode){ jNode.closest("TR").addClass("redBkgd");
+                                     jNode.closest("TR").removeClass("greenBkgd");
                                     }
 
-             function makeGreen(jNode){ jNode.parent().parent().addClass("greenBkgd");
-                                       jNode.parent().next().addClass("greenBkgd");
+             function makeGreen(jNode){ jNode.closest("TR").addClass("greenBkgd");
+                                       jNode.closest("TR").removeClass("redBkgd");
                                       }
 
-             function addGoog(jNode){ jNode.addClass("gAdded");
-                                     var googThisPage = (document.location.href.match('www.dextools.io/app/uniswap/pair-explorer'))?"pair":"pool";
-                                     var theAbbreviation=(googThisPage=="pool")?jNode.parent().parent().siblings().first().children(0).text():jNode.find("strong").text().split(" ")[4];
-                                     var theContract=(googThisPage=="pool")?jNode.parent().parent().siblings().first().children(0).attr('href'):jNode.children("a:first-of-type").attr('href');
-                                     console.log(jNode.children());
-                                     console.log("FOT",jNode.children("a:first-of-type").attr('href'));
-                                     console.log("tc",theContract);
-                                     var thePair=(googThisPage=="pool")?jNode.parent().parent().next().children(0).attr('href'):document.location.href;
-                                     theContract=theContract.substring(theContract.lastIndexOf("/")+1);
-                                     thePair=thePair.substring(thePair.lastIndexOf("/")+1);
-                                     var theIcon='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/'+Web3.utils.toChecksumAddress(theContract)+'/logo.png'
-                                    
-
-                                     var thisCounter = IDcounter.toString();
-                                     //let's create the row icon while we're here
-                                     jNode.parent().parent().siblings("td:first-child").prepend('<img id="AP-DAJS-theCoinRow'+thisCounter+'" class="AP-DAJS-element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP-DAJS-theCoinRow'+thisCounter+'\').classList.add(\'pHide\')"> ');
-
-
-                                     var theTD = jNode.parent().parent()||{};
-                                     var theNextTD = theTD.next()||{};
-                                     function displayPreviewOpener(thisCounter,url,section){
-                                         var theResult = '<div style="float:right" id="AP-DAJS-floater'+section+thisCounter+'" class="AP-DAJS-element">'
-                                         +' <a class="AP-DAJS-element floaterlink" id="AP-DAJS-floaterlink'+section+thisCounter+'" onmouseenter="previewToggle(\''+thisCounter+'\',\''+encodeURIComponent(url)+'\',\''+section+'\')">'
-                                         +'&gt;&#x1F50E;</a></div>';
-                                         return theResult;
-                                     }
-
-                                     var thePreviewResults= '<div id="AP-DAJS-previewResults'+thisCounter+'" style="padding-left: 12px;margin:0; float: right; background: white; width: 285px !important; height: 275px !important; display: block;" class="AP-DAJS-element"><span class="AP-DAJS-element"><b>Quick search results for contract addresses:</b></span><br><iframe style="background:white;border-style:none;position:relative;top:0px;width:285px !important;height:95% !important;" id="AP-DAJS-results'+thisCounter+'" class="AP-DAJS-element"></iframe></div>';
-
-
-                                     var theHTML=
-                                         //~popover button
-                                         '<div class="AP-DAJS-element '+(theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted,i.text-secondary")[0]?'sirImg':'sirImg') //was 'sirImg':'gearImg'
-                                     +' text-'+(theNextTD.children("i.text-info")[0]?'info':theNextTD.children("i.text-warning")[0]?'warning':
-                                                theNextTD.children("i.text-danger")[0]?'danger':theNextTD.children("i.text-success")[0]?'success':'muted')
-                                     +' backImg" id="popButton'+thisCounter+'" data-toggle="popover"'
-                                     + ' data-container="body" data-boundary="viewport" data-placement="top" type="button" data-html="true">'
-                                     + (theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted")[0]?'':theNextTD.children("i.text-danger,i.fa-warning.text-danger")[0]?'<span class="AP-DAJS-element">&#x1f4a9;</span>':theNextTD.children("i")[0]?'N':'')
-                                     + '</div>'
-
-
-                                     + '<div id="popover-content'+thisCounter+'" class="AP-DAJS-element pHide"></div>'
-                                     var contractFloatOpener=displayPreviewOpener(thisCounter,"https://apopheniapays.com/cryptosearch/resultsOnly.html?q=%22"+theContract+"%22+OR+%22"+thePair+"%22",'contract');
-                                     var chartexFloatOpener=displayPreviewOpener(thisCounter,"https://chartex.pro/?symbol=UNISWAP:"+theAbbreviation,'chartex');
-                                     var thisHTML= '<table class="AP-DAJS-element"><tr><td><div class="AP-DAJS-element centered AP-DAJS-popupItem">'
-
-                                     //~initialize side popup
-                                     + '<script id="AP-DAJS-hidePreviewResults">'
-                                     +'document.getElementById("AP-DAJS-previewResults'+thisCounter+'").style.display="none";'
-                                     +'</script>'
-
-                                     //~popover headers
-                                     + '<img id="AP-DAJS-theCoin'+thisCounter+'" class="AP-DAJS-element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP-DAJS-theCoin'+thisCounter+'\').classList.add(\'coinImg\');document.getElementById(\'AP-DAJS-warning'+thisCounter+'\').classList.remove(\'pHide\')"><span contentediable="true"  class="AP-DAJS-element abbrev" id="abbrev'+thisCounter+'">'+theAbbreviation+'</span> <div id="AP-DAJS-warning'+thisCounter+'" class="AP-DAJS-element badge badge-danger pHide">no icon!</div>'
-                                     + '<br />'
-                                     + contractFloatOpener
-
-                                     //~Uniswap etherscan addr
-                                     + '<a class="AP-DAJS-element AP-DAJS-popupWin"  href="https://etherscan.io/token/'+theContract+'"><div class="AP-DAJS-element smallImg addrImg hide"></div></a><span contentediable="true" class="AP-DAJS-element contract text-muted">'+ theContract.substring(0,14)+'...'+theContract.substring(theContract.length-14,theContract.length)
-                                     + '</span>'
-
-                                     //~Uniswap pool addr
-                                     + '<br />'
-                                     + '<a  class="AP-DAJS-element AP-DAJS-popupWin" href="https://uniswap.info/pair/'+thePair+'"><div class="AP-DAJS-element smallImg unisImg hide"></div></a> <span contentediable="true" class="AP-DAJS-element contract text-muted">'+ thePair.substring(0,14)+'...'+thePair.substring(thePair.length-14,thePair.length)
-                                     + '</span>'
-                                     + '</div>'
-
-                                     //CryptoCompare Price
-                                     + '<hr class="AP-DAJS-element"><span class="AP-DAJS-element">Cryptocompare price:</span> <span id="priceSpanUSD'+thisCounter+'" class="AP-DAJS-element"></span> <span onclick="javascript:alert(\'CryptoCompare\\\'s free API is not reliable and returns incorrect data. Sorry, I\\\'ll reenable this when I can find a reliable free data source. Love, your developer\')" class="AP-DAJS-element"><u>disabled</u></span>'
-                                     + '<!-- script>DAgetCCPrice("'+theAbbreviation+'","USD'+thisCounter+'");DAgetCCPrice("'+theAbbreviation+'","ETH'+thisCounter+'")</script -->'
-                                     + '<hr class="AP-DAJS-element">'
-
-                                     //~Google Custom Seach Enging - crypto web search, include crypto news & social media, exclude block explorers
-                                     + '<div class="AP-DAJS-element backImg googImg hide"></div>'
-                                     + '<a onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin makeBold"'
-                                     + ' href="https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22&orig='+theAbbreviation+'&icon='+encodeURIComponent(theIcon)+'">'
-                                     +' Ox Addresses</a> | <a  '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://apopheniapays.com/cryptosearch/results.html?q=%22$'+theAbbreviation+'%22&orig=Token%20addr%20'+theContract+'%20and%20Uniswap%20liquidity%20pool%20address'+thePair+'&icon='+encodeURIComponent(theIcon)+'">&quot;$'+theAbbreviation+'&quot;</a> <br> Crypto Filtered Web Search'
-                                     +'<hr class="AP-DAJS-element"> '
-
-                                     //~whole web search
-                                     + '<div class="AP-DAJS-element backImg googImg hide"></div> <a '
-                                     +'  onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin makeBold"'
-                                     +' href="https://www.google.com/search?q=%22'+theContract+'%22+OR+%22'+thePair+'%22">'
-                                     +' Ox Addresses</a> | <a '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://www.google.com/search?q=%22$'+theAbbreviation+'%22">&quot;$'+theAbbreviation+'&quot;</a> <br> Whole Web Search'
-                                     +'<hr class="AP-DAJS-element"> '
-
-                                     //~zerion
-                                     +'<a '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://app.zerion.io/explore/asset/'+theAbbreviation+'-'+theContract+'">'
-                                     +' <div class="AP-DAJS-element backImg zeriImg hide"></div>Token/Portfolio Analytics</a> <br>Zerion'
-                                     +'<hr class="AP-DAJS-element">'
-
-                                     //~Uniswap
-                                     +'<div class="AP-DAJS-element backImg unisImg hide"></div> <a  '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://uniswap.info/token/'+theContract+'">Token Analytics</a> | '
-                                     +' <a  '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://uniswap.info/pair/'+thePair+'">Pool Stats</a> <br>Uniswap'
-                                     +'<hr class="AP-DAJS-element">'
-
-                                     //~Mooniswap
-                                     +'<div class="AP-DAJS-element backImg moonImg hide"></div> <a  '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://mooniswap.info/token/'+theContract+'">Token Analytics</a> | '
-                                     +' <a  '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://mooniswap.exchange/#/swap?inputCurrency='+theContract+'">Live trading</a> <br>1inch Mooniswap'
-                                     +'<hr class="AP-DAJS-element">'
-
-                                     //~unicrypt
-                                     +'<a  '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://unicrypt.network/uniswap-browser/pair/'+thePair+'">'
-                                     +' <div class="AP-DAJS-element backImg crypImg hide"></div>Verify liquidity lock</a> <br>Unicrypt'
-                                     +'<hr class="AP-DAJS-element"> '
-
-                                     //~cerberus.saren
-                                     +'<a '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://cerberus.saren.io/coins/'+theContract+'">'
-                                     +' <div class="AP-DAJS-element backImg cerbImg hide"></div> Token analytics</a> <br> cerberus.saren'
-                                     +'<hr class="AP-DAJS-element"> '
-
-                                     //~Chartex
-                                     /*  + chartexFloatOpener No, don't the popover is really too small for Chartex */
-                                     +'<a '
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://chartex.pro/?symbol=UNISWAP:'+theAbbreviation+'">'
-                                     +' <div class="AP-DAJS-element backImg chexImg hide"></div> Candlestick chart</a> <br> ChartEX'
-                                     +'<hr class="AP-DAJS-element">'
-
-                                     //~Uniswap.vision
-                                     +'<a'
-                                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP-DAJS-element AP-DAJS-popupItem AP-DAJS-popupWin"'
-                                     +' href="https://uniswap.vision/?ticker=UniswapV2:'+theAbbreviation+'ETH">'
-                                     +' <div class="AP-DAJS-element backImg visiImg hide"></div> Candlestick chart</a> <br> uniswap.vision'
-                                     +'</td><td>'+thePreviewResults
-                                     +'</td></tr></table>' //end links
+             function addGoog(jNode){
+                 if (!jNode.hasClass("gAdded")) { /* console.log(jNode); */
+                     var googThisPage = (document.location.href.match('www.dextools.io/app/uniswap/pair-explorer'))?"pair":"pool";
+                     console.log("gAdded?", jNode.hasClass("gAdded"));
+                     console.log(googThisPage+" node ",jNode.html());
+                     var theAbbreviation=(googThisPage=="pool")?jNode.parent().parent().siblings().first().children(0).text():jNode.prev().find("strong").text().split(" ")[4];
+                     var theContract=(googThisPage=="pool")?jNode.parent().parent().siblings().first().children(0).attr('href'):jNode.prev().children("a:first-of-type").attr('href');
+                     var thePair=(googThisPage=="pool")?jNode.parent().parent().next().children(0).attr('href'):document.location.href;
+                     console.log("contract 1",theContract);
+                     var theIcon='';
+                     try {theContract=theContract.substring(theContract.lastIndexOf("/")+1);
+                          theIcon='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/'+Web3.utils.toChecksumAddress(theContract)+'/logo.png';} catch(e) {theContract="";}
+                     thePair=thePair.substring(thePair.lastIndexOf("/")+1);
+                     /* console.log("ABC", jNode.html()); */
+                     console.log("contract 2",theContract);
 
 
 
-                                     +''; // just leave this at bottom so I don't have to keep moving semicolon as I add things
+                     var thisCounter = IDcounter.toString();
+                     //let's create the row coin icon while we're here
+                     try{
+                         jNode.closest("td").siblings("td:first-child").prepend('<img id="AP_DAJS_theCoinRow'+thisCounter+'" class="AP_DAJS_element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP_DAJS_theCoinRow'+thisCounter+'\').classList.add(\'pHide\')"> ');
+                     } catch(e) {}
 
-                                     //                 var theHTML = '<Div href="#" data-toggle="popover" title="Popover Header" data-html="true" data-content="'+theInnerHTML.replace(/"/g,'\\"')+'" class="AP-DAJS-element">Toggle popover</div>';
-                                     //gotta use a DIV anot an IMG, because IMG with SRC="" or missing SRC attribute causes visual glitches, unwanted borders, etc
-                                     googThisPage=="pool"?jNode.parent().parent().append( theHTML):jNode.next().append( theHTML);
-                                     var showFunction=function() { var _this = this;
-                                                                  $("div.sirImg").not(this).popover('hide');
-                                                                  $(this).popover("show");//$('#frame'+thisCounter).src='https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22';
-                                                                  $(".popover")
-                                                                      .on("mouseleave", function() {
-                                                                      $(_this).popover('hide');
-                                                                  });
-                                                                 }
-                                     $("div#popButton"+thisCounter).popover({ trigger: "manual",
-                                                                             html: true,
-                                                                             animation: false,
-                                                                             sanitize:false,
-                                                                             content: function() { return thisHTML;} /* prevent duplicate elements */
-                                                                            })
-                                         .on("mouseenter",ShowAssistantOnHover?showFunction:"" )
-                                         .on("click",showFunction ).on("mouseleave", function() {
-                                         var _this = this;
-                                         setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
-                                                                                                  }
-                                                               }, 300);
-                                     });
+                     var theTD = jNode.closest("TD")||{};
+                     var theNextTD = theTD.next()||{};
+                     function displayPreviewOpener(thisCounter,url,section){
+                         var theResult = '<div style="float:right" id="AP_DAJS_floater'+section+thisCounter+'" class="AP_DAJS_element">'
+                         +' <a class="AP_DAJS_element floaterlink" id="AP_DAJS_floaterlink'+section+thisCounter+'" onmouseenter="AP_DAJS_previewToggle(\''+thisCounter+'\',\''+encodeURIComponent(url)+'\',\''+section+'\')">'
+                         +'&gt;&#x1F50E;</a></div>';
+                         return theResult;
+                     }
+
+                     var thePreviewResults= '<div id="AP_DAJS_previewResults'+thisCounter+'" style="padding: 12px 0 0 12px;margin:0; float: right; top:0;background: white; width: 285px !important; height: 275px !important; display: block;word-break:break-word;word-wrap:break-word;" class="AP_DAJS_element"><span class="AP_DAJS_element"><b>Quick search for contract addresses:</b></span><br><iframe style="background:white;border-style:none;position:relative;top:0px;width:285px !important;height:95% !important;" id="AP_DAJS_results'+thisCounter+'" class="AP_DAJS_element"></iframe><br><span class="font-weight-normal">(Warning:<wbr> excessive<wbr> posts<wbr> only<wbr> on<wbr> social<wbr> media<wbr> sites<wbr> like<wbr> /biz/<wbr> or<wbr> Reddit <wbr>could<wbr> be <wbr>a coordinated <wbr>Pump & Dump. <wbr>Official <wbr>and <wbr>non-anonymous <wbr>sources <wbr>are <wbr>best.)</span></div>';
 
 
+                     var theHTML=
+                         //~popover button
+                         '<div class="AP_DAJS_element '+(theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted,i.text-secondary")[0]?'sirImg':'sirImg') //was 'sirImg':'gearImg'
+                     +' text-'+(theNextTD.children("i.text-info")[0]?'info':theNextTD.children("i.text-warning")[0]?'warning':
+                                theNextTD.children("i.text-danger")[0]?'danger':theNextTD.children("i.text-success")[0]?'success':'muted')
+                     +' backImg" id="popButton'+thisCounter+'" data-toggle="popover"'
+                     + ' data-container="body" data-boundary="viewport" data-placement="top" type="button" data-html="true">'
+                     + (theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted")[0]?'':theNextTD.children("i.text-danger,i.fa-warning.text-danger")[0]?'<span class="AP_DAJS_element">&#x1f4a9;</span>':theNextTD.children("i")[0]?'N':'')
+                     + '</div>'
 
-                                     /* didn't work, forget it     (function(){ new Clipboard('#copy-buttonContract'+thisCounter);
+
+                     + '<div id="popover-content'+thisCounter+'" class="AP_DAJS_element pHide"></div>'
+                     var contractFloatOpener=displayPreviewOpener(thisCounter,"https://apopheniapays.com/cryptosearch/resultsOnly.html?q=%22"+theContract+"%22+OR+%22"+thePair+"%22",'contract');
+                     var chartexFloatOpener=displayPreviewOpener(thisCounter,"https://chartex.pro/?symbol=UNISWAP:"+theAbbreviation,'chartex');
+                     var thisHTML= '<table class="AP_DAJS_element"><tr style="vertical-align:top"><td><div class="AP_DAJS_element centered AP_DAJS_popupItem">'
+
+                     //~initialize side popup
+                     + '<script id="AP_DAJS_hidePreviewResults">'
+                     +'document.getElementById("AP_DAJS_previewResults'+thisCounter+'").style.display="none";'
+                     +'</script>'
+
+                     //~popover headers
+                     + '<img id="AP_DAJS_theCoin'+thisCounter+'" class="AP_DAJS_element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP_DAJS_theCoin'+thisCounter+'\').classList.add(\'coinImg\');document.getElementById(\'AP_DAJS_warning'+thisCounter+'\').classList.remove(\'pHide\')"><span contentediable="true"  class="AP_DAJS_element abbrev" id="abbrev'+thisCounter+'">'+theAbbreviation+'</span> <div id="AP_DAJS_warning'+thisCounter+'" class="AP_DAJS_element badge badge-danger pHide">no icon!</div>'
+                     + '<br />'
+                     + contractFloatOpener
+
+                     //~Uniswap etherscan addr
+                     + '<a class="AP_DAJS_element AP_DAJS_popupWin"  href="https://etherscan.io/token/'+theContract+'"><div class="AP_DAJS_element smallImg addrImg hide"></div></a><span contentediable="true" class="AP_DAJS_element contract text-muted">'+ theContract.substring(0,14)+'...'+theContract.substring(theContract.length-14,theContract.length)
+                     + '</span>'
+
+                     //~Uniswap pool addr
+                     + '<br />'
+                     + '<a  class="AP_DAJS_element AP_DAJS_popupWin" href="https://uniswap.info/pair/'+thePair+'"><div class="AP_DAJS_element smallImg unisImg hide"></div></a> <span contentediable="true" class="AP_DAJS_element contract text-muted">'+ thePair.substring(0,14)+'...'+thePair.substring(thePair.length-14,thePair.length)
+                     + '</span>'
+                     + '</div>'
+
+                     //CryptoCompare Price
+                     + '<hr class="AP_DAJS_element"><span class="AP_DAJS_element">Cryptocompare price:</span> <span id="priceSpanUSD'+thisCounter+'" class="AP_DAJS_element"></span> <span onclick="javascript:alert(\'CryptoCompare\\\'s free API is not reliable and returns incorrect data. Sorry, I\\\'ll reenable this when I can find a reliable free data source. Love, your developer\')" class="AP_DAJS_element"><u>disabled</u></span>'
+                     + '<!-- script>AP_DAJS_getCCPrice("'+theAbbreviation+'","USD'+thisCounter+'");AP_DAJS_getCCPrice("'+theAbbreviation+'","ETH'+thisCounter+'")</script -->'
+                     + '<hr class="AP_DAJS_element">'
+
+                     //~Google Custom Seach Enging - crypto web search, include crypto news & social media, exclude block explorers
+                     + '<div class="AP_DAJS_element backImg googImg hide"></div>'
+                     + '<a onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin makeBold"'
+                     + ' href="https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22&orig='+theAbbreviation+'&icon='+encodeURIComponent(theIcon)+'">'
+                     +' Ox Addresses</a> | <a  '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://apopheniapays.com/cryptosearch/results.html?q=%22$'+theAbbreviation+'%22&orig=Token%20addr%20'+theContract+'%20and%20Uniswap%20liquidity%20pool%20address'+thePair+'&icon='+encodeURIComponent(theIcon)+'">&quot;$'+theAbbreviation+'&quot;</a> <br> Crypto Filtered Web Search'
+                     +'<hr class="AP_DAJS_element"> '
+
+                     //~whole web search
+                     + '<div class="AP_DAJS_element backImg googImg hide"></div> <a '
+                     +'  onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin makeBold"'
+                     +' href="https://www.google.com/search?q=%22'+theContract+'%22+OR+%22'+thePair+'%22">'
+                     +' Ox Addresses</a> | <a '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://www.google.com/search?q=%22$'+theAbbreviation+'%22">&quot;$'+theAbbreviation+'&quot;</a> <br> Whole Web Search'
+                     +'<hr class="AP_DAJS_element"> '
+
+                     //~zerion
+                     +'<a '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://app.zerion.io/explore/asset/'+theAbbreviation+'-'+theContract+'">'
+                     +' <div class="AP_DAJS_element backImg zeriImg hide"></div>Token/Portfolio Analytics</a> <br>Zerion'
+                     +'<hr class="AP_DAJS_element">'
+
+                     //~Uniswap
+                     +'<div class="AP_DAJS_element backImg unisImg hide"></div> <a  '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://uniswap.info/token/'+theContract+'">Token Analytics</a> | '
+                     +' <a  '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://uniswap.info/pair/'+thePair+'">Pool Stats</a> <br>Uniswap'
+                     +'<hr class="AP_DAJS_element">'
+
+                     //~Mooniswap
+                     +'<div class="AP_DAJS_element backImg moonImg hide"></div> <a  '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://mooniswap.info/token/'+theContract+'">Token Analytics</a> | '
+                     +' <a  '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://mooniswap.exchange/#/swap?inputCurrency='+theContract+'">Live trading</a> <br>1inch Mooniswap'
+                     +'<hr class="AP_DAJS_element">'
+
+                     //~unicrypt
+                     +'<a  '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://unicrypt.network/uniswap-browser/pair/'+thePair+'">'
+                     +' <div class="AP_DAJS_element backImg crypImg hide"></div>Verify liquidity lock</a> <br>Unicrypt'
+                     +'<hr class="AP_DAJS_element"> '
+
+                     //~cerberus.saren
+                     +'<a '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://cerberus.saren.io/coins/'+theContract+'">'
+                     +' <div class="AP_DAJS_element backImg cerbImg hide"></div> Token analytics</a> <br> cerberus.saren'
+                     +'<hr class="AP_DAJS_element"> '
+
+                     //~Chartex
+                     /*  + chartexFloatOpener No, don't the popover is really too small for Chartex */
+                     +'<a '
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://chartex.pro/?symbol=UNISWAP:'+theAbbreviation+'">'
+                     +' <div class="AP_DAJS_element backImg chexImg hide"></div> Candlestick chart</a> <br> ChartEX'
+                     +'<hr class="AP_DAJS_element">'
+
+                     //~Uniswap.vision
+                     +'<a'
+                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                     +' href="https://uniswap.vision/?ticker=UniswapV2:'+theAbbreviation+'ETH">'
+                     +' <div class="AP_DAJS_element backImg visiImg hide"></div> Candlestick chart</a> <br> uniswap.vision'
+                     +'</td><td>'+thePreviewResults
+                     +'</td></tr></table>' //end links
+
+
+
+                     +''; // just leave this at bottom so I don't have to keep moving semicolon as I add things
+
+                     //                 var theHTML = '<Div href="#" data-toggle="popover" title="Popover Header" data-html="true" data-content="'+theInnerHTML.replace(/"/g,'\\"')+'" class="AP_DAJS_element">Toggle popover</div>';
+                     //gotta use a DIV anot an IMG, because IMG with SRC="" or missing SRC attribute causes visual glitches, unwanted borders, etc
+                     if(googThisPage=="pool") {jNode.parent().parent().append( theHTML);} else {jNode.append( theHTML);}
+                     var showFunction=function() { var _this = this;
+                                                  $("div.sirImg").not(this).popover('hide');
+                                                  $(this).popover("show");//$('#frame'+thisCounter).src='https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22';
+                                                  $(".popover")
+                                                      .on("mouseleave", function() {
+                                                      $(_this).popover('hide');
+                                                  });
+                                                 }
+                     $("div#popButton"+thisCounter).popover({ trigger: "manual",
+                                                             html: true,
+                                                             animation: false,
+                                                             sanitize:false,
+                                                             content: function() { return thisHTML;} /* prevent duplicate elements */
+                                                            })
+                         .on("mouseenter",ShowAssistantOnHover?showFunction:"" )
+                         .on("click",showFunction ).on("mouseleave", function() {
+                         var _this = this;
+                         setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
+                                                                                  }
+                                               }, 300);
+                     });
+
+
+
+
+
+
+                     /* didn't work, forget it     (function(){ new Clipboard('#copy-buttonContract'+thisCounter);
                      new Clipboard('#copy-buttonAbbrev'+thisCounter);
  })(); */
 
-                                     //.popover({ html: true,trigger : 'hover',	content: function() { return $('#popover-content'+thisCounter).html(); }});
-                                     IDcounter++;
-                                    }
+                     //.popover({ html: true,trigger : 'hover',	content: function() { return $('#popover-content'+thisCounter).html(); }});
+                     IDcounter++;if(theContract!=""){jNode.addClass("gAdded");}
+                     return true;}
+             }
 
              function poolWarning(jNode) { var theClasses= jNode.prop("class");
 
@@ -784,25 +950,49 @@ function filterFunction(filterAddr,tableId,theColor) {
                                           var thePoolLeft = jNode.closest("td").siblings().last().prev()
                                           thePoolLeft.addClass(theClass).addClass("makeBold");
                                           thePoolLeft.prev().prev().addClass(theClass).addClass("makeBold");
-                                          //<i _ngcontent-ljj-c46="" class="AP-DAJS-element ng-tns-c46-2 fa fa-info-circle ml-1 pools-icon-warning  text-danger ng-star-inserted" style=""></i>
+                                          //<i _ngcontent-ljj-c46="" class="AP_DAJS_element ng-tns-c46-2 fa fa-info-circle ml-1 pools-icon-warning  text-danger ng-star-inserted" style=""></i>
                                          }
 
              //add Styles
+             //Check if fontawesome is installed, add if not
+             $(document).ready(
+
+                 function () {
+                     let span = document.createElement('span');
+
+                     span.className = 'fa';
+                     span.style.display = 'none';
+                     document.body.insertBefore(span, document.body.firstChild);
+
+                     function css(element, property) {
+                         return window.getComputedStyle(element, null).getPropertyValue(property);
+                     }
+
+                     if (css(span, 'font-family') !== 'FontAwesome') {
+                         let headHTML = document.head;
+                         $(headHTML).append('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">');
+                         s
+                     }
+                     document.body.removeChild(span);
+                 }
+
+             );
+
              GM_addStyle ( `
 
 
 /*body {max-width: 100% ;max-height: 100% ; overflow: hidden} yes, need this to prevent scrollbars during animation, but, breaks pair explorer */
 
-       #AP-DAJS-preview {position:fixed;display:none;top:15px;bottom:15px;right:15px;left:50%;z-index:9998;padding:12px;}
-                 #AP-DAJS-closebutton {height:24px;widht:24px;position:fixed;top:5px;right:5px;border:1px solid black;content:'X';color:red;background-color:white;font-size:24px;font-weight:bold;}
-#AP-DAJS-popupframe {height:100%;width:100%};
+       #AP_DAJS_preview {position:fixed;display:none;top:15px;bottom:15px;right:15px;left:50%;z-index:9998;padding:12px;}
+                 #AP_DAJS_closebutton {height:24px;widht:24px;position:fixed;top:5px;right:5px;border:1px solid black;content:'X';color:red;background-color:white;font-size:24px;font-weight:bold;}
+#AP_DAJS_popupframe {height:100%;width:100%};
 
 .invisible{ display:none; }
 
 
 
 
-div.AP-DAJS-popupItem, a.AP-DAJS-popupItem, a.AP-DAJS-popupItem:hover{ font-size:10px;color:black;font-style:normal;
+div.AP_DAJS_popupItem, a.AP_DAJS_popupItem, a.AP_DAJS_popupItem:hover{ font-size:10px;color:black;font-style:normal;
  }
 
 .centered{ text-align:center
@@ -917,7 +1107,7 @@ content:'\\f0b0';
 
 .sorting {text-decoration:underline;}
 
-.sorting:after {content:'<span class="AP-DAJS-element"><i>(sorting...)</i></span>';}
+.sorting:after {content:'<span class="AP_DAJS_element"><i>(sorting...)</i></span>';}
 
 div.popover-body hr {margin:0px !important;}
 
@@ -945,8 +1135,8 @@ body.dark-theme .greenBkgd, body.dark-theme td.bg-light.greenBkgd{ background-co
 .makeBold{ font-weight:bold;
  }
 
-.AP-DAJS-clickable, a.AP-DAJS-element {cursor:pointer;}
-.AP-DAJS-clickable:hover, a.AP-DAJS-element:hover {opacity: .5; color:#007bff;}
+.AP_DAJS_clickable, a.AP_DAJS_element {cursor:pointer;}
+.AP_DAJS_clickable:hover, a.AP_DAJS_element:hover {opacity: .5; color:#007bff;}
 
 i.fa-warning{ background-color:#FFFF00 !important;
  }
@@ -962,12 +1152,16 @@ i.fa-warning{ background-color:#FFFF00 !important;
 !important;
  margin-left: 7px !important;}
 
-.sirImg { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAD4ElEQVRIDZ2UbUxbVRzGT1lxTgjGwG1ZjItZdE582fywOHyNX0zUDxo/GRMX50IkKkoJMspAOjZqbymyLo6ZoBZh0NHX3dvSDeyYWFihLS2UseJm0fFiSq2tE9aO18fcyshABtWb3OQ8//M8v/u/595zCEnwomSmDwU0+06C9gRtEkkSRbOgaHYgwURiNqGcFS2BkSFj3kostZGrpFlI8upBCk9p7jms79mqMIc2imw4D+AZe3i2o8gZhNjqS98mYx/jl+tA0SbxhuG1DABSFxcxYLGcw7e0FE7LGQDoi3sLGk6n0yzuk2nuXSu7bg1A1zGlEhUVRyCVSlF6qATHv6jm4IZ3da6dpKgZArlJsS5k9SSAaiNjhKigAKOjo3C73QgEAigrLcMFgw4TwLOk+PQhrusMaeuO1fk76th0bFL2uQwOlwN2ux1WqxWOXgeUSiXqak9yXX8QD5e2gJIxhjuCVk9EQpFgzr4c5Ivy4XS54Pf70T/Qj9z3c9Ft6+bAL8YzuXWVmQozMmjmpdWMNfWN6Wiw7NNSqJubUSIW48SXtSguFqOx4RQHlawIFTbNC6pMwytqawkAd4+PTUzTFTQH6R0fG9fbOrsWOQHAy2UAvHrrAQ9Usa+Tj+pBDjatv2lUvsiDLrsDalUjB6oBkDU/vwCWNcP6/fkogKkfOn7E13XfADNReMMzb9ePTI21DAciazW6XHuoxlo3PDiEE4oaOByOWQDR7Oy94Bq9K3kTdu/KQnIyP64f3bkD0ehMbLirMxb0OCGy+f/5qMu0pcHmI5pH9jb2YKjfizajCTk5B+IADnrr5vP54PF4y5qrP/3E47j+1w3sUnVHidiQvppL+BLteQ7s7nXNslojtxQL4tz9uJ9KxTZhGuqPKeILra5V4qms7chI24T9b7wMRENgrk2VE1EDhAr2+AowJWNfIWUavKZ1H/zJ4/m1TWfgIAf+AETB0HVfODI1GAXkzOS0MAR8HIvd9E4Ewj5uJ9om/9zOwZLKtSfjJ6Dc9PAynKJZf/JhPXarLg65epxzvvZWFHWOeEh+Y/tz6r7fs5ucgdRKxkby6pktEl3Hnu/sEy+0eMKZ1WcdJE91LuUz7ZWt1a2jS0drp6CKeZJQcvPzmQrzCClssuxRXRzxeTzwmBnUeIMR8t5XV3gSnZdXrhlMOWr8JbPK9Fta5ZlrPIn2EinXDmw5qr8qkJsmBDQ7SdHsIEWz7RTNXqXkzCeESC7wCQGPaz8ACH7u64O+Uc0txZvLr/RfBgCPSCRJKyIAUi5funyz3dL2/8EriLeJhYUFem5uLgLg37/Obb6Nhn8Dna1ooIakiNYAAAAASUVORK5CYII=)
+
+
+.sirImgOLDTriangle { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAD4ElEQVRIDZ2UbUxbVRzGT1lxTgjGwG1ZjItZdE582fywOHyNX0zUDxo/GRMX50IkKkoJMspAOjZqbymyLo6ZoBZh0NHX3dvSDeyYWFihLS2UseJm0fFiSq2tE9aO18fcyshABtWb3OQ8//M8v/u/595zCEnwomSmDwU0+06C9gRtEkkSRbOgaHYgwURiNqGcFS2BkSFj3kostZGrpFlI8upBCk9p7jms79mqMIc2imw4D+AZe3i2o8gZhNjqS98mYx/jl+tA0SbxhuG1DABSFxcxYLGcw7e0FE7LGQDoi3sLGk6n0yzuk2nuXSu7bg1A1zGlEhUVRyCVSlF6qATHv6jm4IZ3da6dpKgZArlJsS5k9SSAaiNjhKigAKOjo3C73QgEAigrLcMFgw4TwLOk+PQhrusMaeuO1fk76th0bFL2uQwOlwN2ux1WqxWOXgeUSiXqak9yXX8QD5e2gJIxhjuCVk9EQpFgzr4c5Ivy4XS54Pf70T/Qj9z3c9Ft6+bAL8YzuXWVmQozMmjmpdWMNfWN6Wiw7NNSqJubUSIW48SXtSguFqOx4RQHlawIFTbNC6pMwytqawkAd4+PTUzTFTQH6R0fG9fbOrsWOQHAy2UAvHrrAQ9Usa+Tj+pBDjatv2lUvsiDLrsDalUjB6oBkDU/vwCWNcP6/fkogKkfOn7E13XfADNReMMzb9ePTI21DAciazW6XHuoxlo3PDiEE4oaOByOWQDR7Oy94Bq9K3kTdu/KQnIyP64f3bkD0ehMbLirMxb0OCGy+f/5qMu0pcHmI5pH9jb2YKjfizajCTk5B+IADnrr5vP54PF4y5qrP/3E47j+1w3sUnVHidiQvppL+BLteQ7s7nXNslojtxQL4tz9uJ9KxTZhGuqPKeILra5V4qms7chI24T9b7wMRENgrk2VE1EDhAr2+AowJWNfIWUavKZ1H/zJ4/m1TWfgIAf+AETB0HVfODI1GAXkzOS0MAR8HIvd9E4Ewj5uJ9om/9zOwZLKtSfjJ6Dc9PAynKJZf/JhPXarLg65epxzvvZWFHWOeEh+Y/tz6r7fs5ucgdRKxkby6pktEl3Hnu/sEy+0eMKZ1WcdJE91LuUz7ZWt1a2jS0drp6CKeZJQcvPzmQrzCClssuxRXRzxeTzwmBnUeIMR8t5XV3gSnZdXrhlMOWr8JbPK9Fta5ZlrPIn2EinXDmw5qr8qkJsmBDQ7SdHsIEWz7RTNXqXkzCeESC7wCQGPaz8ACH7u64O+Uc0txZvLr/RfBgCPSCRJKyIAUi5funyz3dL2/8EriLeJhYUFem5uLgLg37/Obb6Nhn8Dna1ooIakiNYAAAAASUVORK5CYII=)
 !important;
  margin-left: 7px !important;}
 
 
-
+.sirImg { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAATCAYAAACUef2IAAAD8UlEQVQ4EY3SfUyVVRzA8ac/dGplq5w1c/3R2z+ZFDmbzrbWRlvGyEA0tQDJF5gwmth4URMu1wsMJQiQGyjilbcrLxdNAq6Nii4ZKPiGi5dAYEmgQPf+LlyBrnzbQzDAjPFsZ+f5nd/5fc5zznMU5YEnKV8sa7NFXE/YZJ3BIR4mp7yrt8uSSpssrRfxzRLxPC2y3ijiXiCyIlUk6qJ05DH4zAPUVJhukBr/SGHzCRspTdA7Cu1dPbQ7wcUOym0rqxuFA0YhqEj4uETIsAjD94Rah/QkDT4EP2aQGp+Dwo4wG5daoe/PZuLCggjc5k1y9D66bnfxvgOUdisvNwpBeYJ7plDdIoDQZBNqZBpOd/eirJNSExAh7Am3UlELv12uZKOHGwcOHCQqOprdgQGkBO6k7VY7C/pHUBzCvE7B9bhw6uK/cK9DGHUInQ7pMQ8NLVOSjGLxjhcCkwStwcHYfTsazRdoNFpyc3JIS03DbDaz3W87lfqvyRyB58uFF68Kpj7B0S/k9gk5dwXDXaGoX0i5I4NKvFF8XfIFt0IhvQXab9QSF6vjfNl5dDod6enpGAwG/P13kHsqif422LtH+CpKoE2IGRKUG4LSJCjNE/01KR3/c6F5EvrKcSG/E65afuCN11wI+TyESnMlZwrPUGA0ssFjPfW131H2MwRrhdhIYVupoNwVlNaJ9ruwsFGuTV0HRVHWptkKtM1QnJ3JTr/PKM41sNXbCw/3D/H09ORsyWmaOmDLXjsB4cJRjbC4QVD+mEKVmzK8q23giRmwGpxu47I++QiJ8UcYBfQn8sk4ph8/d4AQ3TAlVdDdAsEXxlDarFPbvyH4tMqa/6DqABC8PywSS/lZCvvgp3sqBz9WXaC6+hJOoOlmHdXmfHpw4jMK6wYgE/jyljXwoegEfEif9g3x0dEMjo5hH4MP3nNDXXPJk4sJDdnFwgXzxuNN77wN94awDvxFV6kJGNk0GxxVbCzm00/8WOP6OqtWrhhHVPhh7aXly3nusUfRp2eoG/OfFdZGaamvqycuPm4GtvrNleRmJ/LWqpmLeXl6qWgHMH9WODYmlvKy8jtAleWXGpIPR2BIjcEmdnodcH/gb75NO8rh/RFUVFSqqMVuty/9X1RNAFEJsQmcM53rn4g3mKzQMAgnCyAkyEbY92PsA7qgAPhoVnAyqcIxh2IoyFVreFod351t2/LUUSE0Qcg/JMw3j99b02TNnHpAo9PoMBWZ1Gu8bLLIt9Sm3ZwghCcKi65LO/DIZG5OPZCgix6H1S+ecW4BKXL92Wwha9j6wpyw6ZOcTqe7pdoiVxqu9ACPT8/VWeyvZv5q3zh9bLb3fwBYLlKabrfnIAAAAABJRU5ErkJggg==)
+!important;
+ margin-left: 7px !important;}
 
 .cerbImg{ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAA2CAYAAADZJImDAAAFJ0lEQVRYCe2Yz28VVRTHv+fOz/fQVyhKAjH+IIit3blTNpJG3isVYwqvMSHBRBP+Axfu6lpXxpUuSHAlRRINtH0IEjfIwo1IKaKJRqIEKLSUUObNr2POnfezr30zLW9j4ixm7twf5zPn3HPuuXPBAAEA58e2s3PolJTlYpSNWrE3jwYIB/LsjjO7h87VJfcSpupCgYIJxHdB7jC7h6alnjAZ9QrWAtJIC+zFILvEbnmml7CVINFDgf0qyC72ErYKSGtmg6t+J2xirf56ULcbiTMQwIzDBbjVGwAV9GvijT7IEegMPHozmbOkfzehq7WlfaFAPFC+BJc/TAQcNVcTlFaXBpLxBhBKZFlpwrq1ZwFpRwco7iYorS0jCIhrK0iawLXaM4PWEpC1/n9QVkt19Ou96fiEAWadelppGwq+VgFtZWYDRJGuY1agZkj0TiNmUyBPBHOv77p7qaAhol3t6g2I2QJRuGfp57eqZuHCUt/mJFPTeIQa7PFBPGuDKHgunB25/GThG4of8H2jb3hbcC3J1DXY44E0ZMh/OrhWumnkpnwEUABTvBjcNzcPu+FcRVuOxqONg2qQZ8LZkWXTnlYIQTGLIyiALIoXfRj9++qwDXjddUYN0h/MluaN3BQ3INyYfAA24oUARmGfG//647o1+rLyngMa8jcFc8VHZm5aUkiiSRuk7myNZ2aQ8sAy6kjxyEMnmCtGpjMjmkCbqxPCgB+pzRaipbOeeunVdJDEuM/wX8vbAip6v4yS6czoZNgFYqkt9pZw8bxnDhZlXDooALDThn3x+E2w/8pfTuF0NwhAEautthvdO3fLGigJpMxspIJ4h2Hgt1u4cuyzd4C/z3czFyQ/Kssw+O7JeXPwDQLCMp8wJomiVK/jvFKEeb6zc/seIAeE9wIYykpmTL63dskMkuzjGTHxF1L7PP/hTtILnpRTNaKbQQj7Rdpb/uojwD+uzG0C8evyG8/Geh2B4FQc7+ronwKRUMgEegRGvwHcvu+Dnn3XDG59T2qLDO6EiU5xHAMRyHFPO+HsiISCwFI10jrPR4gHt7ryZZftoWHmhUoXmEIcRzq+jNyU413dL7B0kEi3CGrO03mGAeWpgVJ3GBtJfIlm9hnHu3IgG0jcyVV6Fn6f+lRvJFNhJLAoEDcgJ/9tZlB90nftP9XIMV1hTBGUYYnHc+SNZgbJ8p/AdhNaEloHTOstEDJkN81hUKqaL09lBgHc3ncFLOaFCsQbGcsJxASH1VLVGqxk87q6zUC14L5e00wCtJmqq2qgZEUL01A78gQFowWS3eu01eLWXNPAt8IemAP7Y//GJyoMig+1JrKXGNLx1m6O5vAVJTG8SrZRK1r0q9Ys+Rv0naEPHlqDZ8EXZFckS7K+MoKkL8tPEoDdjcUmea/daSLWG0f+ydI7H9pb65+0py6qTWHNzWCzbkWJ5E8VDS1aWzNr9J/9P2q6bqvePSgroFwz35JM3jrmbH10JWcHeojrnASMTQyWn+IOz2ouQesD1HtrbWL34AzIGQGiiFbNutqiHfC6kCxPFeTGLhLcIrNXTc4UOoZFYtE40bSjMWuFWsqFxyQrE5QDycHtlxzRuMzLZ79+6p+Pk6bP2wKxvfvab9ocnB8bRWyeTjKB3qjLuiaHTjY4qJA3qfdnjAlFmNjQwYZiHLVo+dQZGDyij5NABoOrgG0z+981IWVjo5CGngKTl9v9B8Y5V2Z2D7O/aeyHuvf16hRSA+uwxb633/fzBy/1GvIvo5s1+uLsF3wAAAAASUVORK5CYII=)
 !important;
@@ -1006,8 +1200,12 @@ font-size:15px;
 padding: 0 2px 6px 0;}
 
 
-.gearImg{ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAATCAYAAACUef2IAAAA+klEQVQ4Ea1UPQ7CIBTmDAYYjKPRA7kZB2dPYRy0j/QOzo48ooOJ8QSewiuoqwYsCYW2vEabNPC+P74ylDHiw5UBXpg5UU6XCcC3fekOglIoXPpgsdNjgoUmqULPPpzmyqgE4C28AruXgKuMLU/HLeM5n9CgaAtxuMJrg4UGVcGHWC0AX5aLcdLc1tabc7zX1Va+PU6skYOe1ohgEAXue7emtqHqXB8JpqQ2kYVeWO0ATqPgY5q3vVowxkh6AfigtvW1hqXh1iMVzjyWrN/T9T0hMkBn604yE2xp51eIidQSCdgDkKDXSYZv+6/V9Qku//Jj8NP/CSWYzQe4WOyxcf17xQAAAABJRU5ErkJggg==)
+.gearImgOLDtriangle{ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAATCAYAAACUef2IAAAA+klEQVQ4Ea1UPQ7CIBTmDAYYjKPRA7kZB2dPYRy0j/QOzo48ooOJ8QSewiuoqwYsCYW2vEabNPC+P74ylDHiw5UBXpg5UU6XCcC3fekOglIoXPpgsdNjgoUmqULPPpzmyqgE4C28AruXgKuMLU/HLeM5n9CgaAtxuMJrg4UGVcGHWC0AX5aLcdLc1tabc7zX1Va+PU6skYOe1ohgEAXue7emtqHqXB8JpqQ2kYVeWO0ATqPgY5q3vVowxkh6AfigtvW1hqXh1iMVzjyWrN/T9T0hMkBn604yE2xp51eIidQSCdgDkKDXSYZv+6/V9Qku//Jj8NP/CSWYzQe4WOyxcf17xQAAAABJRU5ErkJggg==)
 !important;}
+
+.gearImg{ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAASCAYAAABfJS4tAAADIElEQVQ4EZWT+0tTYRjH365QEPVbf0BFIfVLBBEF/dgPYdDVLCLTaqmJlGW3VdJFpYa6zC42Td1UtLJ0nulx2cysdHkBu0dZSjd1XTxpbnOnT6xNdJRoB76c9zzv83x4zvd9XiGGPcDEfLPHHmKGXTJKlIwSbkVJKkFZ8RBl9hMU3Q2UKAuKxooSWY2y2ghnG1THJZgzDDW0BMZfK1Sbk3WQWAcH7BBfB1kyJDTC5J8ggDVvoNgCx2sg9h7IDR7Uvn4aVOePkzBriCiEN3/K9SK19UgaZGbDqZsQ/gDSzRDZAuN6QHwF0QmiD5a1wQULaK6B7bUbcPO07yfVvb3OwzD/DxyYLueprUnJcDkHcjLhUjbE18CiD74uhQrCBcLtFzDjGwQXgqlJpR8nz/t66Ohx0Ob80S/BAmGq8uRFGOGgDEctcKQCEiyQLMFaG6y7DRFWCPNrmxU2W2B5LTz+7qKn08WWLjcbO11s7XIT/cXJpk8DL0TZM/fCVRLq9kew46FPIa1wugSqk6A0HUrPBep6CpQlAs9dxA14EO0gPvmt+gArX6lH/9hRdNezYUsJRN+DPTaIuQt770CGEc6ZIC0/UKlFUKCHsAoQThAOEN0gumBBO8aAA0wrV+PWl8HuWthbDRF2SCiHTAPoTYHSmcCaAUteguj1AcUXmPYWewB08CPZrGaHVkF0DWjug7YCsgyQkj8E9v5B3kVIkP3deiflK0x6T3d9JzMHWX+9tRL2mBqItEFsLegL4HzuEFhXCJIe1tpBDIC3U9EB0mf34r9gwwOP25gZU0q315LwejgmwRUDpA3akQvmTJj31jfT4jMkdRAynDHi+sajgaWht0BTD9pKMGRBqt+O4gyItYHw+CYh5B1nRgT9ayO3TtV44TsbQFcMF67CmUKQ9RDc5APPbfsl/6t21JiuXE1ZZ4ND3q4NvhtpNMGEbyDe86zxI1NHhYyUsO8WUlQlnM+BknQIqwfxHZep3RU0Us2Y4i0tzAi9yUutBBWpMKsZwh2e1WMqHi3J0uwKOnERDhXAfod6cLT8/9qvqlLjtbVjP6zfBMsWA2DNDr0AAAAASUVORK5CYII=)
+!important;}
+
 
 
 .crypImg{ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAJI0lEQVRIDX1Xe3BVxRn/fbt77iv3kgQTk5gHrxAwERAIRSRo4gNqZ4rTCjidqq2dsTLOyDh1Op2hnfa209JOtf7RTqeWcSp2fAxctFqYQlsxQQwIKiqQGAkIBoMmEvK6ufe8drez59yr0XZ6Zs7dPefu7u/7fd/v+3YP4f9cnbpddFCXXxzyWt/6VNkCsTAO0UCgcgCMQOMS8szZE+N965b8a6o49stzi++LLRU709tdeiM3z5soI037hr79axbEdwC92nN0LSMG5QNmshAEzrSOCf6RBepWUM/NpczfzTyt0yyDHiquMx3jv4CnW9rprf9qRNA2Umzp0AceTnZn8d4xG4P9vh46rbQBr5zHqHGJRUuuT2Dp6hQa6qNgwCkJvXU+7doTGtAuaJrnzLsvAE8HfVl//Y8W+AOnj+XxwmOjct9OVwOa1YFR6XxCJEnBZDev8WmfxhCUBqA23BvDXQ9VimWLU/Ahn5hLu+4376ev/QXgdGe7SHd0+Y/8c23Jwput/cznbc/8eFg++7u8mj+TW1XXMkADnqMhPUCr0HHEAG4BkVjIYeB1hQ9zvrd5a4r94Ff1nEEe+scfsrdu2bLP0fpz5sHotE6zNKXNUrQzv67by7JVj9w4bA/0quiidZx8B7AnNZQLMAvgcUC7CONs7DG+UAAREJ9BsCJA1789veIrlr390Jx4SQQHmyjTbkw1+jExZ+ahGT2BAU9mb3nCdmnVYzcN27leHWu5lVN2SCN/WYPHgFh1yDJ3TINFAau0ECwNMA4Y9vkJjcnLGu1rLTpzTMbuv+Fc3ge78T294fFwdvjLd+mNkU2U8f801nEHCf7rF7eOyfN7pFV1EyMnC4gZABPARLdGaiHDnPUcsUbC4G4F+zwQn02wEoByQiMMa8PengJmL2HUfdDnUtlqdUfZis3ppqMd9Hy/iXdRXPz3E+3vfnhEtjy1Lus13swsZxjwTwIeNK7+LUeqnhBLMFTO5UikGC73KZx92UPPoz5cAFeuCsVm+BAH/Dxgj2qU1TF0v+p5zx6/yrpmaeLtxfT8smCM+dk2esM34dHz+zdPyYlTihgjRjGg9h5CajYhVcFQ2SQQYQSuCBYxRCMEuITsoEJ/p4NDD7vgCWAypzEMoKWFobqFgRNhfEihvIb5P322TnDI9cvppT3CADta3jn2AWHoBeUnl1M0Ugc0PkiYUc+QSDIIUCgmo2DjIwKkDVjC5LFAbVMEc5Y6ePXxPOassHBVo8CMcoGPTrk4ttsOBLn3ORd3/czG3AWRbwPYIx46d21ZNuevuXAU4CCmLgGRZcDYKUCOaMSvCx3DWFAfwRiZOhncpClQuk8a81fF0dQahz2mcOGEi64dWfTu8FHSDCSrAg2zdw9lUTO/rO2lvvUpIWOiycnrmkvvSHBoEV9BcC4Cw2c0arYxcEEgaYAIRGSqUtCavhGSuYVFmByWOP2qjSNP2uh+xcc8MFSsJkjHxFujMUbUd8xB2yZZO3OB1SRy0LO0D9hn4fN6EjILXLWBUHktw4xqBvgIWBqAIqhpg9u4XYXAl0d9PHp3Fs11DG23Cvi2hpsNDTOltWQu4WKPrx0f5EHNEo6SpcpjkJ9AUQIoWQhEygARxWeggWuDrajAuMgaxu0E0oAVYWht5SALsMc0lAzz2gTKpJeIE8ZPa+34ihygguWVJEcV6p8fiqZ0HiFWzmASJHDnZ0DT3BzuiUG95pwwMSzxyZuFdYLxBnLaZfLbBlylTIoSm1JyzIYErwdzzwKliwiJKhaoOGQasgpdG+ZqQdihYQYEBM6N+83q08CKXYYg1smFRC4U8lKOsimJD3PKg67RIgLoylUEOQWQKsS2EM9ATMXYGiCjbhZ6wICVVQqULyD4dmBJETIwxFQ+96JGxTWMfJKwXZxnY4O83xH+x7pRI3k7SW8cyJ7TENGQnWFtekXG5smwC8Wjw35eYWaNQPN6CxPv6KBuF5HNBmLq+tSI1jXLBVQUF8cHWR87uebk6BSXh2mZhH8GcsRsADzc6gLWJoUCRRcMKcabKEgTy2KIJ3mwVY5/LBGtC3erInBQk8mIn1TtSgseV0e2zN83YYjAduVOu8GGN1eJMz9SavKcDtQaKLYQw6LITAFRvkbJDAbpAwNvO8iOSBzeOYkTT/tIzQrjbMYbNbMSIH8amH0HQ2IOIefKpw1mUDIXL2594fDxoydnb44uqmqKeaXzGGPGRQWmYVsoIkAQX5ObyXKG/dsmMXh0Es6QRt2agAekW0hHY3QUyF3U3sr7IlZeeyd/WXn4RQPMmnuaIxlkJHfxi/P1WTQ8oKl6kdBm8w9iW3SzydeCbowntAQSKY7aJQJj/Qq1NzHkR4CzhxSyFzQuH9egUiB3ALphC6PSVsNWbzWg5rTDelt6PewCH7huYPfghPvUG2pcXH5fuvkBE6vQ5UU3G+DP3R96JJpgGIDGiRclpk5rfG97Er85XoW7/5pC7wGFZBs5TT+0RM5x//JY3ZG9aQ1mjljG1Robw+zTqwfvpe7qhZ9KrNyUrLQTcR5VnqYwlQpVKhAXgmplUqq8iqP9NoF1DybR0BRFZa2FZIyj/DZLv3VP3hEPq5gN5/CO2uP3GbY9mY0EZMIYg6DQCWGEetvrybX72GTna6VY1pGr8KsSMQ2lzX+BQM3kInPf07i6LY5FaxIoqxBgisAkKe2SHFcuu2Kbjo3kndenLiRvMVU9rdtFmjLBB8Jni5kF8eZyC61veRtN3D+9tCOeinzrnplXoimekqmI5XMiznWgLTIbvDAHAsEQ5aSFZpITyZwvRb+b5XvHRgAHz/zkk4rvdnR0+d9/c7m1vfUtL8ApGF/sh20nBDrMngTglepNUG56UWXp1auvKEeDSKCcRZC0hB8VXBk3QGnmScVzJOmCyuPgpVEcGMv1rIpFf35k8fsZs0x7Z7vo6vj8U8i8+yLjAC2IOkMGhE2Qf9bLrfs7z30DWt0JEb1+STxRPasshlTECqpZ1pf4KOvgjbw7DOl2QUQyeuXKv5H5/NkFnt4InTah/NL1v4HNIA1Cb7OFll5zlguutkMN5a85Y41QshHEkoAErGgWOnLu5kR5/4GVfSPFsSZNe5t7PXNqKr6b3v4HaBvXgUhJ9kIAAAAASUVORK5CYII=)
