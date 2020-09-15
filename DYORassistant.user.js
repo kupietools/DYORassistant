@@ -1,15 +1,16 @@
 // ==UserScript==
 // @name         DYORassistant
 // @namespace    https://apopheniapays.com/
-// @version      ALPHA-ALPHA-2020.09.15
+// @version      ALPHA-2020.09.15b
 // @description  Adds some research tools and visual niceties to popular DeFi utilities and sites. Does not interfere with existing functionality, just adds cosmetics for user convenience.
 // @author       @ApopheniaPays
 // @updateURL    https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
 // @downloadURL  https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
-// @match        *://*/*
-// @match        http://www.dextools.io/app/*
-// @match        https://dextools.io/app/*
-// @match        http://dextools.io/app/*
+// @match        *://etherscan.io/*
+// @match        *://www.dextools.io/app/*
+// @match        *://app.astrotools.io/*
+// @match        *://dapp.trendering.com/*
+// @match        *://unitradebeta.com/*
 // @grant        GM_addStyle
 // @grant        GM.xmlHttpRequest
 // @connect      github.com
@@ -256,31 +257,35 @@ var ethplorerkey="freekey";
 /**/
 /**/
 
-var currentVersion="ALPHA-2020.09.15";
+var currentVersion="ALPHA-2020.09.15b";
 var thisHistory= encodeURIComponent(`
 
 VERSION HISTORY
 ===============
 
-2020.09.15 - Change background row coloring to use transparency and lighten hex address coloring
-so also works with stupid "dark themes". Another minor change to logo icon for maximal visual
-prettiness. Resize Zerion icon and table sort arrows for extra layoutical betterness. Under-the-
-hood changes in preparation for pseudopluginization & increased ease of incorporating new sites.
+2020.09.15b - security upgrade only. Remove wildcard @match in favor of whitelisting specific
+websites.
 
-2020.09.14t - Fix regression errors introduced in 2020.09.13t causing research assistant popover
-to be added multiple times on DEXTools Pool Explorer page. Introduce object property arrays to
-store page codes and page-specific values. Store page codes in attribute in body tag so can be
-used in selectors to create page-specific selectors in the global scope. Prevent filtering and
-Zerion from appearing on Etherscan links Pool Explorer page because DEXTools has their own
-filtering and Zerion is in the research assistant popover.
+2020.09.15 - INSECURE VERSION, DO NOT USE - Change background row coloring to use transparency
+and lighten hex address coloring so also works with stupid "dark themes". Another minor change
+to logo icon for maximal visual prettiness. Resize Zerion icon and table sort arrows for extra
+layoutical betterness. Under-the-hood changes in preparation for pseudopluginization & increased
+ease of incorporating new sites.
 
-2020.09.13t - transitional version while I work on code refactoring for greater portability. Remove
-page restrictions so table features appear on all sites where there are ethereum addresses.
-Finally fix button for Reasearch Assistant popover not appearing on pair page. Get Zerion links,
-address coloring, and table sorting working on all sites instead of just DEXTools. Add footer
-popovers for credits and version history. Color rows that contain cells labeled "buy" or "sell".
-Add classes and functions to remove additions if element that triggered their creation is gone.
-Spiffy new icon.
+2020.09.14t - INSECURE VERSION, DO NOT USE - Fix regression errors introduced in 2020.09.13t
+causing research assistant popover to be added multiple times on DEXTools Pool Explorer page.
+Introduce object property arrays to store page codes and page-specific values. Store page codes
+in attribute in body tag so can be used in selectors to create page-specific selectors in the
+global scope. Prevent filtering and Zerion from appearing on Etherscan links Pool Explorer page
+because DEXTools has their own filtering and Zerion is in the research assistant popover.
+
+2020.09.13t - INSECURE VERSION, DO NOT USE - transitional version while I work on code
+refactoring for greater portability. Remove page restrictions so table features appear on all
+sites where there are ethereum addresses. Finally fix button for Reasearch Assistant popover
+not appearing on pair page. Get Zerion links, address coloring, and table sorting working on
+all sites instead of just DEXTools. Add footer popovers for credits and version history. Color
+rows that contain cells labeled "buy" or "sell". Add classes and functions to remove additions
+if element that triggered their creation is gone. Spiffy new icon.
 
 2020.09.02 - add popover Research Assistant menu to Pair Explorer page, fixes to contact info
 indication, preparation for moving repository and begin rebrand to DYORa, titles to DYORa and
