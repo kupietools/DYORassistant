@@ -109,11 +109,12 @@ it here, but I haven't checked.
 
 ## Features
 
-Global enhancemensts:
+Global enhancements (currently works on DEXTools.io, Astrotools.io, Trendering.com, Etherscan.io, and Unitradebeta.com):
 
 1.) In any table that has a header row, columns are now sortable.
 
-2.) Ethereum addresses in table columns can be filtered to show only the rows for that address. 
+2.) Ethereum addresses in table columns (indicated by links to Etherscan.io address pages) can be filtered to show only 
+the rows for that address. 
 
 3.) Any links to Etherscan.io now also have a button added to look that address up on Zerion. Ethereum addresses
 are color coded to make repeated transactions from the same address more noticeable in tables.
