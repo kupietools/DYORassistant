@@ -1,3 +1,5 @@
+#NOTE, 2020 sep 19: currently hard at work fixing functionality disabled by today's major under-the-hood changes in DEXTools's UI. New version should be posted soon. 
+
 # DYORassistant (formerly "DEXTassistant")
 
 An independently developed userscript bringing new UI features and embedded research tools to popular DEX- & 
