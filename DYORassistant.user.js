@@ -740,7 +740,7 @@ var filterState="";
 </script>
 `);
                      });
-                     waitForKeyElements ( "body[ap_dajs_pagetype=pair] h3.page-title>a",hiliteExtraInfo); //nth-child(2) didn't work because 2nd child isn't 'a'!
+                    // waitForKeyElements ( "body[ap_dajs_pagetype=pair] h3.page-title>a",hiliteExtraInfo); //nth-child(2) didn't work because 2nd child isn't 'a'!
                      waitForKeyElements ( "body[ap_dajs_pagetype=pair] h3.page-title + small",addGoog);
                      /************************ end pair page functions ************************/
                  }
@@ -752,7 +752,7 @@ var filterState="";
              function hiliteExtraInfo(jNode) { //visually highlight when there's extra contact info for a token
                  var thisParent=jNode.parent();
                  if (thisParent.children("a").length>1 && !(jNode.siblings("div#contactInfoFound").length)) {
-                     thisParent.append(" <div id='contactInfoFound' class='badge badge-success'>&lt;- <small>has contact info</small><!-- &#x1F60A;--></div>");
+                    thisParent.append(" <div id='contactInfoFound' class='badge badge-success'>&lt;- <small>has contact info</small><!-- &#x1F60A;--></div>");
                  } //let's only post it once.
                  //jNode.children("a").addClass("badge").addClass("badge-success").html(jNode.children("a").html().append("Contact info found!"));
 
