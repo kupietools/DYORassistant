@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DYORassistant
 // @namespace    https://apopheniapays.com/
-// @version      ALPHA-2020.09.15c
+// @version      ALPHA-2020.09.20
 // @description  Adds some research tools and visual niceties to popular DeFi utilities and sites. Does not interfere with existing functionality, just adds cosmetics for user convenience.
 // @author       @ApopheniaPays
 // @updateURL    https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
@@ -40,7 +40,7 @@ DeFi-related websites, to give you an edge and help avoid scams. Follow
 
 ## I. Origins
 
-The folks behind the website  [http://DEXTools.io](http://DEXTools.io) have built a great information explorer
+The website  [http://DEXTools.io](http://DEXTools.io) started out as the most popular info explorer
 for Uniswap. However, I found that as I explored the information it gave me, I had to do far too
 much clicking around to other websites to do my own research on the coins listed. I wanted a quicker
 way to gather information and determine which coins might be worth investing in, and more importantly,
@@ -75,6 +75,10 @@ support that myself.
 At the same time, I plan on concurrently transitioning away from using DEXTools in my own trading. But I'll
 make an effort to support the existing DEXTools-related features, and even continue to add new ones that were
 already in the planning stages, for as long as possible.
+
+UPDATE, September 20 2020: Following major under-the-hood changes to DEXTools's UI that are too difficult
+to be worth dealing with, some of the script functionality no longer works on that site. The above notes will
+be updated shortly. The next major revision of this script will bring full functionality to other sites.
 
 # DISCLAIMER
 
@@ -151,6 +155,10 @@ the rows for that address.
 3.) Any links to Etherscan.io now also have a button added to look that address up on Zerion. Ethereum addresses
 are color coded to make repeated transactions from the same address more noticeable in tables.
 
+### NOTE: as of 2020 sep 20, not all features listed below may work on DEXTools.io anymore, due to radical
+under-the-hood changes to how DEXTools displays information. Most basic functionality has been restored, but not
+all. This is the last version of this script that any features are guaranteed to work on DEXTools.
+
 DEXTools.io enhancements:
 
 1.) The most prominent addition is a new icon under the Pool Explorer's Actions column, which opens a
@@ -211,6 +219,11 @@ var ShowAssistantOnHover = true;
 var ethplorerkey="freekey";
 //NOT YET IN USE. When activatory, if you run into hourly limits on some of the EthPlorer info (not yet included) because you have looked at more than 50 tokens in an hour, you can sign up for an API key at https://ethplorer.io/wallet/#register, get an API key from https://ethplorer.io/wallet/#screen=api, and replace "freekey" with it to raise your limits.
 
+var scamWallets= {scammer:{wallet:"0x408f2ff726aae56ea7382b8676d8db43d624df7c",
+                  reason:"yfking.link scammer",
+                  url:"https://www.dextools.io/app/uniswap/pair-explorer/0x9ad1c11fd75c4c29e414bbc5c8cce83765c19911"}};
+//NOT YET IN USE. Would like to eventually track wallets that I've verified are involved in scams
+
 // *
 /****** END USER-CONFIGURABLE OPTIONS ***********/
 
@@ -256,14 +269,18 @@ var ethplorerkey="freekey";
 /**/
 /**/
 
-var currentVersion="ALPHA-2020.09.15c";
+var currentVersion="ALPHA-2020.09.20";
 var thisHistory= encodeURIComponent(`
 
 VERSION HISTORY
 ===============
 
-2020.09.15c - Minor upgrade, fix incorrect text and broken icon or Astrotools linkage
+2020.09.20 - Fixes to restore some usability to Dextools after major UI overhaul that stopped
+using table tags. Remove filtering on Dextools, as it is no longer possible. Squash some minor
+bugs that were polluting the consol. THIS IS THE LAST VERSION THAT WILL OFFICIALLY SUPPORT
+DEXTOOLS.IO. Some functionality will work but it will no longer be considered officially supported.
 
+2020.09.15c - Minor upgrade, fix incorrect text and broken icon or Astrotools linkage
 
 2020.09.15b - security upgrade only. Remove wildcard @match in favor of whitelisting specific
 websites.
@@ -316,7 +333,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
 
              //Hey ho, let's go
 
-            
+
 
              var newVersionAvail="";
              var newVersionHistory="";
@@ -326,7 +343,7 @@ this.$ = this.jQuery = jQuery.noConflict(true);
                  url:newVersionURL,
                  onload: function(scrptTxt) {
                      var versionMtch = scrptTxt.response.match(/\/\/\s+@version\s+(.+)/i);
-                     newVersionHistory = encodeURIComponent(scrptTxt.response.match(/var thisHistory= \`([\s\S]+?)\`/i)[1]);
+                     newVersionHistory = encodeURIComponent(scrptTxt.response.match(/var thisHistory= encodeURIComponent\(\`([\s\S]+?)\`/i)[1]);
                      if (versionMtch  &&  versionMtch.length > 1) {
                          newVersionAvail = encodeURIComponent(versionMtch[1]);
                          if(newVersionAvail!=currentVersion) {waitForKeyElements('span#newVersion',addNewVersion);}
@@ -519,10 +536,8 @@ this.$ = this.jQuery = jQuery.noConflict(true);
              addJS_Node(null, null, AP_DAJS_previewToggle);
 
              function AP_DAJS_filterFunction(filterOn,tableId,theColor) {
-                 console.log("filterOn",filterOn);
-                 var filterAddr=filterOn.parentNode.getAttribute("ap_dajs_valuecalc")
+                 var filterAddr=filterOn;//filterOn.parentNode.getAttribute("ap_dajs_valuecalc");
                  var thisIndex = Array.from(filterOn.parentNode.parentNode.children).indexOf(filterOn.parentNode);
-                 console.log("filterAddr",filterAddr);
                  if (typeof window.filterState === 'undefined') {window.filterState="";}
                  var filter= (window.filterState=="")?filterAddr:"";
                  window.filterState=filter;
@@ -537,8 +552,6 @@ this.$ = this.jQuery = jQuery.noConflict(true);
                      td = tr[i].getElementsByTagName("td")[thisIndex];
                      if (td) {
                          txtValue = td.getAttribute("ap_dajs_valuecalc"); //td.textContent || td.innerText;
-                         console.log("txtValue",txtValue);
-
                          if (txtValue.indexOf(filter) > -1 || filter=="" ) {
                              tr[i].style.display = "";
                          } else {
@@ -565,8 +578,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
                  return(seconds);
              }
 
-             waitForKeyElements ( "thead>tr>th", prepareTable);
-             waitForKeyElements ("td", setTDvalue);
+             waitForKeyElements ( "thead>tr>th, ngx-datatable", prepareTable);
+             waitForKeyElements ("td,datatable-body-cell", setTDvalue);
+
              waitForKeyElements ( ".circle", addLogo);
              waitForKeyElements ( "span.copyright.ml-auto.my-auto.mr-2", addDisclaimer);
              waitForKeyElements ( "body:not([AP_DAJS_pageType='pool']) a[href*='/address/0x']", prepareEtherscanLink);
@@ -582,13 +596,14 @@ this.$ = this.jQuery = jQuery.noConflict(true);
                  var theHex= /0\x[0-9a-f]+/i.exec(thisHREF)[0];
                  try {var theTest=theHex.length;
                       thisNode.attr('style','color: #'+theHex.toHexColour()+' !important');
-                      try { if( thisNode.closest("TD").length) {
-                          var thisIndex=thisNode.closest("TD").index();
-                          var theTable=thisNode.closest("table").attr('id');
-                          var theDupeCount=$("table#"+theTable+" a[href='"+thisHREF+"']").length;
-
-                          if (theDupeCount>1){
-                              thisNode.parent().prepend('<i title="filter on this address" class="AP_DAJS_element AP_DAJS_clickable filterbutton fa fa-filter pools-icon-warning ng-tns-c46-2" onclick="AP_DAJS_filterFunction(this,\''+thisNode.closest("table").attr("id")+'\',\''+theHex.toHexColour()+'\')"><sup style="font-size:.5em;">'+theDupeCount+'</sup></i>'); }
+                      try { if( thisNode.closest("TD,datatable-body-cell").length) {
+                          var thisIndex=thisNode.closest("TD,datatable-body-cell").index();
+                          var theTable=thisNode.closest("table,ngx-datatable").attr('id');
+                          var theDupeCount=$("#"+theTable+" a[href='"+thisHREF+"']").length;
+                          if (theDupeCount>1 && document.body.getAttribute("AP_DAJS_pageType") != 'pair' )
+/* we're not going to do this on DEXtools pair page anymore, the dynamically generated data table rows are bogus. */
+ {
+                              thisNode.parent().prepend('<i title="filter on this address" class="AP_DAJS_element AP_DAJS_clickable filterbutton fa fa-filter pools-icon-warning" onclick="AP_DAJS_filterFunction('+thisNode.closest("table,ngx-datatable").attr("ap_dajs_valuecalc")+',\''+thisNode.closest("table,ngx-datatable").attr("id")+'\',\''+theHex.toHexColour()+'\')"><sup style="font-size:.5em;">'+theDupeCount+'</sup></i>'); }
                       }} catch (e) {console.log("ERROR - theHex",theHex);console.log(e);}
                       //style="background:#'+theHex.toHexColour()+' !important"
                       //  jNode.closest("td").next().attr('style','background: #'+theHex.toHexColsorttour()+' !important');
@@ -609,7 +624,9 @@ this.$ = this.jQuery = jQuery.noConflict(true);
                  thisTD.find(".AP_DAJS_element").remove();
 
                  jNode.attr("AP_DAJS_valueCalc",
-                            ( thisTD.text()!="" && thisTD.text().replace(/[ 0-9hdmsHDMS]*/g,"")=="" )?timeStringToSeconds(thisTD.text()):(isNaN(thisTD.text().replace(/[$,]/g,"")))?thisTD.text().toLowerCase():parseFloat(thisTD.text().replace(/[$,]/g,""))
+                            ( thisTD.text()!="" && thisTD.text().replace(/[ 0-9hdmsHDMS]*/g,"")=="" )?
+                            timeStringToSeconds(thisTD.text()):
+                            (isNaN(thisTD.text().replace(/[$,]/g,"")))?thisTD.text().toLowerCase().replace(/ /g,""):parseFloat(thisTD.text().replace(/[$,]/g,""))
                            ); /*convert relative times to epoch time so don't have to worry about cell relative value updating, as it does. */
 
 
@@ -623,12 +640,14 @@ this.$ = this.jQuery = jQuery.noConflict(true);
              }
 
              function prepareTable (jNode) {
-                 if (!jNode.closest("table").attr("id"))
-                 {  jNode.closest("table").attr("id",Math.floor(Math.random() * Math.floor(Math.random() * Date.now())));}
+                 if (!jNode.closest("table,ngx-datatable").attr("id"))
+                 {  jNode.closest("table,ngx-datatable").attr("id",Math.floor(Math.random() * Math.floor(Math.random() * Date.now())));}
+             if (jNode.prop("tagName") == "TH") {
                  jNode.addClass("AP_DAJS_clickable");
-                 jNode.attr("onclick","AP_DAJS_sortTable("+jNode.index()+","+jNode.closest("table").attr("id")+")");
-                 jNode.append('<span class="AP_DAJS_element DAsorter" id="AP_DAJS_th'+jNode.closest("table").attr("id")+jNode.index()+'">⇅</span>');
-             }
+                 jNode.attr("onclick","AP_DAJS_sortTable("+jNode.index()+","+jNode.closest("table,ngx-datatable").attr("id")+")");
+                 jNode.append('<span class="AP_DAJS_element DAsorter" id="AP_DAJS_th'+jNode.closest("table,ngx-datatable").attr("id")+jNode.index()+'">⇅</span>');
+
+             }}
 
 
              /* Watch for window URL change: */
@@ -676,9 +695,8 @@ astropair:{url:"//app.astrotools.io/pair-explorer"}};
                          thisPage=prop;}
 
                  }
-
                  document.body.setAttribute("AP_DAJS_pageType",thisPage);
-                 //   waitForKeyElements ( "div.card-header.border-bottom.ng-tns-c46-2>h6", addLink);
+
                  if(thisPage=="pool"){
                      /************************ pool page functions ************************/
                      $(document).ready(function(){
@@ -699,12 +717,12 @@ astropair:{url:"//app.astrotools.io/pair-explorer"}};
 </script>
 `);
                      });
-                     waitForKeyElements ( "td:nth-child(4) > a.badge-danger", makeRed);
-                     waitForKeyElements ( "td:nth-child(4) > a.badge-success", makeGreen);
-                     waitForKeyElements ( "td:nth-child(3) > a > i.fa-wpexplorer.pools-icon-warning:not(i.gAdded)", addGoog);
-                     waitForKeyElements ( "td:nth-child(4) > i.fa-info-circle.pools-icon-warning", poolWarning);
-                     waitForKeyElements ( "td:nth-child(9) > a.ng-tns-c46-2.badge.badge-danger", rugPull);
-                     //            waitForKeyElements ( "td:nth-child(5) > span", ccAdd);
+                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4) a.badge-danger", makeRed);
+                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4) a.badge-success", makeGreen);
+                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(3)  a > i.fa-wpexplorer.pools-icon-warning:not(i.gAdded)", addGoog);
+                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4)  i.fa-info-circle.pools-icon-warning", poolWarning);
+                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(9)  a.badge.badge-danger", rugPull);
+
 
                      waitForKeyElements ( "#AP_DAJS_popupframe[src='']", togglePreview);
                      /************************ end pool page functions ************************/
@@ -722,9 +740,8 @@ var filterState="";
 </script>
 `);
                      });
-                     //  waitForKeyElements ( "td.ng-tns-c49-2:nth-child(7)", colorCodeHex);
-                     waitForKeyElements ( "h3.page-title>a.ng-tns-c49-2",hiliteExtraInfo); //nth-child(2) didn't work because 2nd child isn't 'a'!
-                     waitForKeyElements ( "h3.page-title + small.ng-tns-c56-2",addGoog);
+                     waitForKeyElements ( "body[ap_dajs_pagetype=pair] h3.page-title>a",hiliteExtraInfo); //nth-child(2) didn't work because 2nd child isn't 'a'!
+                     waitForKeyElements ( "body[ap_dajs_pagetype=pair] h3.page-title + small",addGoog);
                      /************************ end pair page functions ************************/
                  }
 
@@ -743,22 +760,6 @@ var filterState="";
 
              }
 
-             function colorCodeHexOLD(jNode) { /* no longer used
-                 var thisNode = jNode.children("a").first();
-                 var theHex= thisNode.text().replace(/ /g,'');
-                 if( thisNode.closest("table").attr("id")==""){thisNode.closest("table").attr('id','AddressesTable');}
-                 if(jNode.next("td:has(>a.ng-tns-c49-2>span.badge-secondary)").length)
-                 { /~ next cell indicates multiple transactions from this address ~/
-                     thisNode.attr('style','color: #'+theHex.toHexColour()+' !important');
-                     thisNode.parent().prepend('<i title="filter on this address" class="AP_DAJS_element AP_DAJS_clickable filterbutton fa fa-filter pools-icon-warning ng-tns-c46-2" onclick="AP_DAJS_filterFunction(this,\''+thisNode.closest("table").attr("id")+'\',\''+theHex.toHexColour()+'\')"></i>');
-                     //style="background:#'+theHex.toHexColour()+' !important"
-                     //  jNode.closest("td").next().attr('style','background: #'+theHex.toHexColsorttour()+' !important');
-                 }
-                 thisNode.parent().append('<a title="Zerion wallet overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                                          +' href="https://app.zerion.io/'+theHex+'/overview">'
-                                          +' <div class="AP_DAJS_element AP_DAJS_zerionFromAddress backImg zeriImg hide"></div></a>'); */
-             }
-
 
 
              function togglePreview (jNode) {$("#AP_DAJS_preview").toggle();}
@@ -768,8 +769,8 @@ var filterState="";
 
              function rugPull(jNode) { if (jNode.text()=="-100%") { //var rugHTML='<span class="AP_DAJS_element text-warning badge-danger">RUGPULL</span> ';
                  jNode.addClass("badge-dark");
-                 jNode.parent().prevAll().eq(4).children(":first").addClass("badge-dark");
-                 jNode.parent().prevAll().eq(4).children(":first").text("RUGPULL");
+                 jNode.closest("td,datatable-body-cell").prevAll().eq(4).children(":first").children(":first").addClass("badge-dark");
+                 jNode.closest("td,datatable-body-cell").prevAll().eq(4).children(":first").children(":first").text("RUGPULL");
              } }
 
              function addLink(jNode) { var creditHTML='<div style="float:right;font-size:1.25em;" class="AP_DAJS_element"><div class="AP_DAJS_element sirImg backImg"></div> <a href="#" class="AP_DAJS_element">DYORassistant Installed</a></div>';
@@ -827,17 +828,17 @@ var filterState="";
                                             });
                                             /******** end historylink *******/
                                            }
-             function makeRed(jNode){ var theTR=jNode.closest("TR");
+             function makeRed(jNode){ var theTR=jNode.closest("TR,datatable-body-row");
                                      theTR.addClass("redBkgd");
-                                     theTR.children("TD").addClass("redBkgd");
-                                     theTR.children("TD").removeClass("greenBkgd");
+                                     theTR.children("TD,datatable-body-cell").addClass("redBkgd");
+                                     theTR.children("TD,datatable-body-cell").removeClass("greenBkgd");
                                      theTR.removeClass("greenBkgd");
                                     }
 
-             function makeGreen(jNode){ var theTR=jNode.closest("TR");
+             function makeGreen(jNode){ var theTR=jNode.closest("TR,datatable-body-row");
                                      theTR.addClass("greenBkgd");
-                                     theTR.children("TD").addClass("greenBkgd");
-                                     theTR.children("TD").removeClass("redBkgd");
+                                     theTR.children("TD,datatable-body-cell").addClass("greenBkgd");
+                                     theTR.children("TD,datatable-body-cell").removeClass("redBkgd");
                                      theTR.removeClass("redBkgd");
                                     }
 
@@ -845,26 +846,29 @@ var filterState="";
              function addGoog(jNode){
                  if (!jNode.hasClass("gAdded")) { /* console.log(jNode); */
                      var googThisPage = (document.location.href.match('www.dextools.io/app/uniswap/pair-explorer'))?"pair":"pool";
-                     console.log("gAdded?", jNode.hasClass("gAdded"));
-                     console.log(googThisPage+" node ",jNode.html());
-                     var theAbbreviation=(googThisPage=="pool")?jNode.parent().parent().siblings().first().children(0).text():jNode.prev().find("strong").text().split(" ")[4];
-                     var theContract=(googThisPage=="pool")?jNode.parent().parent().siblings().first().children(0).attr('href'):jNode.prev().children("a:first-of-type").attr('href');
-                     var thePair=(googThisPage=="pool")?jNode.parent().parent().next().children(0).attr('href'):document.location.href;
-                     console.log("contract 1",theContract);
+                     //console.log("gAdded?", jNode.hasClass("gAdded"));
+                     //console.log(googThisPage+" node ",jNode);
+                     var theAbbreviation=(googThisPage=="pool")?jNode.closest("TD,datatable-body-cell").siblings().first().children(0).children(0).text():jNode.prev().find("strong").text().split(" ")[4];
+                     var theContract=(googThisPage=="pool")?jNode.closest("TD,datatable-body-cell").siblings().first().children(0).children(0).attr('href'):jNode.prev().children("a:first-of-type").attr('href');
+                     var thePair=(googThisPage=="pool")?jNode.closest("TD,datatable-body-cell").next().children(0).children(0).attr('href'):document.location.href;
+                    // console.log("contract 1",theContract);
                      var theIcon='';
                      try {theContract=theContract.substring(theContract.lastIndexOf("/")+1);
                           theIcon='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/'+Web3.utils.toChecksumAddress(theContract)+'/logo.png';} catch(e) {theContract="";}
                      thePair=thePair.substring(thePair.lastIndexOf("/")+1);
                      /* console.log("ABC", jNode.html()); */
-                     console.log("contract 2",theContract);
+                    // console.log("contract 2",theContract);
 
 
 
                      var thisCounter = IDcounter.toString();
                      //let's create the row coin icon while we're here
-                     try{
-                         jNode.closest("td").siblings("td:first-child").prepend('<img id="AP_DAJS_theCoinRow'+thisCounter+'" class="AP_DAJS_element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP_DAJS_theCoinRow'+thisCounter+'\').classList.add(\'pHide\')"> ');
-                     } catch(e) {}
+                     //try{
+                         jNode.closest("td,datatable-body-cell").siblings("td:first-child,datatable-body-cell:first-child").children(0).prepend('<img id="AP_DAJS_theCoinRow'+thisCounter+'" class="AP_DAJS_element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP_DAJS_theCoinRow'+thisCounter+'\').classList.add(\'pHide\')"> ');
+                     var poolFirstCell=jNode.closest("body[ap_dajs_pagetype=pool] datatable-body-cell").siblings("datatable-body-cell:first-child").children(0);
+                     // poolFirstCell.attr("style","width: 80px; max-width: 130px; height: 35px;");
+                     jNode.closest("td,datatable-body-cell").attr("style","width: 160px; max-width: 160px; height: 35px;");
+                     //} catch(e) {}
 
                      var theTD = jNode.closest("TD")||{};
                      var theNextTD = theTD.next()||{};
@@ -1045,10 +1049,10 @@ var filterState="";
              function poolWarning(jNode) { var theClasses= jNode.prop("class");
 
                                           var theClass = (theClasses.match(/\btext\-[^ ]*\b/g, '')||[""])[0];
-                                          var thePoolLeft = jNode.closest("td").siblings().last().prev()
+                                          var thePoolLeft = jNode.closest("datatable-body-cell").siblings().last().prev()
                                           thePoolLeft.addClass(theClass).addClass("makeBold");
                                           thePoolLeft.prev().prev().addClass(theClass).addClass("makeBold");
-                                          //<i _ngcontent-ljj-c46="" class="AP_DAJS_element ng-tns-c46-2 fa fa-info-circle ml-1 pools-icon-warning  text-danger ng-star-inserted" style=""></i>
+
                                          }
 
              //add Styles
@@ -1145,8 +1149,8 @@ margin:0 1px 3px 1px;
 
  }
 
-td.ng-tns-c49-2.text-danger ~ td.ng-tns-c49-2:nth-child(n+5):nth-child(-n+6) {color:#c4183c;}
-td.ng-tns-c49-2.text-success ~ td.ng-tns-c49-2:nth-child(n+5):nth-child(-n+6) {color:#17c671;}
+body[ap_dajs_pagetype="pool"] datatable-body-cell.text-danger ~ datatable-body-cell:nth-child(n+5):nth-child(-n+6) {color:#c4183c;}
+body[ap_dajs_pagetype="pool"] datatable-body-cell.text-success ~ datatable-body-cell:nth-child(n+5):nth-child(-n+6) {color:#17c671;}
 
 .floaterlink {display:inline-block;text-align:center;border:1px solid #00b8d8;width:1.5em;height:1.5em;margin-top:.5em;font-size:2em;font-weight:bold;-webkit-border-radius: 24px;
 -moz-border-radius: 24px;
@@ -1234,18 +1238,12 @@ div.popover-body input {width:9px;height:9px;}
 
 div.popover-body {font-weight:bold}
 
-.redBkgd, td.bg-light.redBkgd{ background-color: RGBA(255,0,0,.03) !important;//#FFF2F2
+.redBkgd { background-color: RGBA(255,0,0,.03) !important;//#FFF2F2
  }
 
-body.dark-theme .redBkgd, body.dark-theme td.bg-light.redBkgd{ background-color: #440000 !important;
- }
 
-body.dark-theme .text-secondary {color:#bbbbbb !important;}
-body.dark-theme .badge-secondary {background-color:#bbbbbb !important;}
 
-.greenBkgd, td.bg-light.greenBkgd{ background-color:  RGBA(0,255,0,.05) !important;//#CCFFCC !important;
- }
-body.dark-theme .greenBkgd, body.dark-theme td.bg-light.greenBkgd{ background-color: #006900 !important;
+.greenBkgd { background-color:  RGBA(0,255,0,.05) !important;//#CCFFCC !important;
  }
 
 .makeBold{ font-weight:bold;
