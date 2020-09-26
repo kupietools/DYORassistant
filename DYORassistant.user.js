@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DYORassistant
 // @namespace    https://apopheniapays.com/
-// @version      ALPHA-2020.09.20
+// @version      ALPHA-2020.09.25
 // @description  Adds some research tools and visual niceties to popular DeFi utilities and sites. Does not interfere with existing functionality, just adds cosmetics for user convenience.
 // @author       @ApopheniaPays
 // @updateURL    https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
@@ -11,6 +11,7 @@
 // @match        *://app.astrotools.io/*
 // @match        *://dapp.trendering.com/*
 // @match        *://unitradebeta.com/*
+// @match        *://chartex.pro/*
 // @grant        GM_addStyle
 // @grant        GM.xmlHttpRequest
 // @connect      github.com
@@ -269,11 +270,14 @@ var scamWallets= {scammer:{wallet:"0x408f2ff726aae56ea7382b8676d8db43d624df7c",
 /**/
 /**/
 
-var currentVersion="ALPHA-2020.09.20";
+var currentVersion="ALPHA-2020.09.25";
 var thisHistory= encodeURIComponent(`
 
 VERSION HISTORY
 ===============
+
+2020.09.25 - Beginnings of integration with Chartex. Add buy/sell row coloring to transaction
+lists on Chartex.
 
 2020.09.20 - Fixes to restore some usability to Dextools after major UI overhaul that stopped
 using table tags. Remove filtering on Dextools, as it is no longer possible. Squash some minor
