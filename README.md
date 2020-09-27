@@ -1,8 +1,9 @@
+# NOTE: I've been banned from Telegram for reasons unknown. For now news, announcements & chat will be on my Discord server: [https://discord.gg/fREWvmv](https://discord.gg/fREWvmv)
+
 # DYORassistant (formerly "DEXTassistant")
 
 An independently developed userscript bringing new UI features and embedded research tools to popular DEX- &
-DeFi-related websites, to give you an edge and help avoid scams. Follow
-[http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects) on Telegram for announcements.
+DeFi-related websites, to give you an edge and help avoid scams. 
 
 # BACKGROUND
 
