@@ -1,4 +1,4 @@
-# NOTE: I've been banned from Telegram for reasons unknown. For now news, announcements & chat will be on my Discord server: [https://discord.gg/fREWvmv](https://discord.gg/fREWvmv)
+# NOTE: I've been banned from Telegram for reasons unknown. For now, news, announcements & chat will be on my Discord server: [https://discord.gg/fREWvmv](https://discord.gg/fREWvmv)
 
 # DYORassistant (formerly "DEXTassistant")
 
