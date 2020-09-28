@@ -128,9 +128,7 @@ the rows for that address.
 3.) Any links to Etherscan.io now also have a button added to look that address up on Zerion. Ethereum addresses
 are color coded to make repeated transactions from the same address more noticeable in tables.
 
-### NOTE: as of 2020 sep 20, not all features listed below may work on DEXTools.io anymore, due to radical
-under-the-hood changes to how DEXTools displays information. Most basic functionality has been restored, but not
-all. This is the last version of this script that any features are guaranteed to work on DEXTools.
+### NOTE: as of 2020 sep 20, not all features listed below may work on DEXTools.io anymore, due to radical under-the-hood changes to how DEXTools displays information. Most basic functionality has been restored, but not all. This is the last version of this script that any features are guaranteed to work on DEXTools.
 
 DEXTools.io enhancements:
 
