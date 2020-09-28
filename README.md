@@ -1,4 +1,4 @@
-# NOTE: I've been banned from Telegram for reasons unknown. For now, news, announcements & chat will be on my Discord server: [https://discord.gg/fREWvmv](https://discord.gg/fREWvmv)
+### NOTE: I've been unbanned from Telegram. Still decided whether I want to stay with that platform, but for the moment, the announcement channel is still [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects). If that changes it will be posted here. 
 
 # DYORassistant (formerly "DEXTassistant")
 
