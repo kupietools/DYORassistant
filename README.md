@@ -1,4 +1,8 @@
-### NOTE: I've been unbanned from Telegram. Still decided whether I want to stay with that platform, but for the moment, the announcement channel is still [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects). If that changes it will be posted here. 
+### CURRENT NEWS, Sep 28: 1.) This script is in a bit of a state of transition, as it no longer fully works with DEXTools following their switch to a different toolbox under-the-hood, but I haven't yet finished adapting it to be fully functional on Astrotools.io or the other sites I want it to work with. I should have it sorted in a few days, hopefully. 
+
+### 2.) I've been unbanned from Telegram, if you knew about that. Still deciding whether I want to stay with that platform, but for the moment, the announcement channel is still [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects). If that changes it will be posted here. 
+
+# .
 
 # DYORassistant (formerly "DEXTassistant")
 
