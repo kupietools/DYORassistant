@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DYORassistant
 // @namespace    https://apopheniapays.com/
-// @version      ALPHA-2020.09.25
+// @version      ALPHA-2020.10.03s
 // @description  Adds some research tools and visual niceties to popular DeFi utilities and sites. Does not interfere with existing functionality, just adds cosmetics for user convenience.
 // @author       @ApopheniaPays
 // @updateURL    https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
@@ -221,8 +221,8 @@ var ethplorerkey="freekey";
 //NOT YET IN USE. When activatory, if you run into hourly limits on some of the EthPlorer info (not yet included) because you have looked at more than 50 tokens in an hour, you can sign up for an API key at https://ethplorer.io/wallet/#register, get an API key from https://ethplorer.io/wallet/#screen=api, and replace "freekey" with it to raise your limits.
 
 var scamWallets= {scammer:{wallet:"0x408f2ff726aae56ea7382b8676d8db43d624df7c",
-                  reason:"yfking.link scammer",
-                  url:"https://www.dextools.io/app/uniswap/pair-explorer/0x9ad1c11fd75c4c29e414bbc5c8cce83765c19911"}};
+                           reason:"yfking.link scammer",
+                           url:"https://www.dextools.io/app/uniswap/pair-explorer/0x9ad1c11fd75c4c29e414bbc5c8cce83765c19911"}};
 //NOT YET IN USE. Would like to eventually track wallets that I've verified are involved in scams
 
 // *
@@ -243,7 +243,7 @@ var scamWallets= {scammer:{wallet:"0x408f2ff726aae56ea7382b8676d8db43d624df7c",
 // show % increase in pool over initial
 // Maybe gray out any row with no pool left. This requires keeping the ontimer() live, so, think about it.
 // maybe provision to enter your own wellet addresses and hilight them to find your own transactions easily
-// maybe switch to using mutationobservers per https://stackoverflow.com/questions/32233895/using-waitforkeyelements-is-it-possible-to-prevent-the-key-element-from-being-d
+// maybe switch to using mutationobservers per https://stackoverflow.com/questions/32233895/using-waitForKeyElementsWrapper-is-it-possible-to-prevent-the-key-element-from-being-d
 // show when liquidity has grown by a certain amount from initial add
 // make mouse pointer into finger over all clickabl elements
 // expand functions to work on other frequently used sites, like etherscan, Zerion
@@ -270,11 +270,16 @@ var scamWallets= {scammer:{wallet:"0x408f2ff726aae56ea7382b8676d8db43d624df7c",
 /**/
 /**/
 
-var currentVersion="ALPHA-2020.09.25";
+var currentVersion="ALPHA-2020.10.03s";
 var thisHistory= encodeURIComponent(`
 
 VERSION HISTORY
 ===============
+
+2020.10.03s - "Stealth update". Major improvements to integration with Astrotools, most features
+previously developed for DEXTools now work with Astrotools, although there still may be bugs.
+Ethplorer integration begun. Internal conversion to store all page specifications in a hash rather
+than hardcoded, so can much more easily adapt & extend functionality on new sites, which is totally fun.
 
 2020.09.25 - Beginnings of integration with Chartex. Add buy/sell row coloring to transaction
 lists on Chartex.
@@ -332,379 +337,542 @@ CryptoCompare pricing info, soooooperfast table sorting, color-coding and filter
 
 this.$ = this.jQuery = jQuery.noConflict(true);
 //required for compatilibilty in case they start using jQuery on Dextools
+try{
+    (function() {'use strict';
 
-(function() {'use strict';
+                 //Hey ho, let's go
+                 var logErrors=true;
+                 var thisPage="all";
+                 var pageCodes = {pair:
+                                  {url:"www.dextools.io/app/uniswap/pair-explorer",
+                                   features:["noListFilter"],
+                                   onlySortColumns:"",
+                                   addDisclaimerAnchor:"span.copyright.ml-auto.my-auto.mr-2",
+                                   researchAsstAnchor:"body[ap_dajs_pagetype=pair] h3.page-title + small",
+                                   researchAsstPlacement:function(jNode) {return jNode;},
+                                   theAbbreviation:function(jNode){return jNode.prev().find("strong").text().split(" ")[4];},
+                                   theContract:function(jNode){var thisHREF=jNode.prev().children("a:first-of-type").attr('href');return thisHREF.substring(thisHREF.lastIndexOf("/")+1);},
+                                   thePair:function(jNode) {var thisHREF=document.location.href;return thisHREF.substring(thisHREF.lastIndexOf("/")+1);},
+                                   customWaitElements:
+                                   { ".circle":addLogo}
 
-             //Hey ho, let's go
+                                  },
+                                  pool:
+                                  {url:"www.dextools.io/app/uniswap/pool-explorer",
+                                   features:["noListFilter","noZerion"],
+                                   onlySortColumns:"",
+                                   addDisclaimerAnchor:"span.copyright.ml-auto.my-auto.mr-2",
+                                   researchAsstAnchor:"body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(3)  a > i.fa-wpexplorer.pools-icon-warning:not(i.gAdded)",
+                                   researchAsstPlacement: function(jNode) {return jNode.parent().parent();},
+                                   theAbbreviation:function(jNode){return jNode.closest("TD,datatable-body-cell").siblings().first().children(0).children(0).text();},
+                                   theContract:function(jNode){ var thisHREF=jNode.closest("TD,datatable-body-cell").siblings().first().children(0).children(0).attr('href');return thisHREF.substring(thisHREF.lastIndexOf("/")+1);},
+                                   thePair:function(jNode) {var thisHREF=jNode.closest("TD,datatable-body-cell").next().children(0).children(0).attr('href');return thisHREF.substring(thisHREF.lastIndexOf("/")+1);},
+                                   customWaitElements:
+                                   { ".circle":addLogo,
+                                    "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4) a.badge-danger":makeRed,
+                                    "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4) a.badge-success":makeGreen,
+                                    "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4) i.fa-info-circle.pools-icon-warning":poolWarning,
+                                    "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(9) a.badge.badge-danger":rugPull}
+
+                                  },
+                                  astropair:
+                                  {url:"app.astrotools.io/pair-explorer",
+                                   features:["noZerion","noListFilter"],
+                                   onlySortColumns:"TH:nth-child(7)",
+                                   addDisclaimerAnchor:"div.ant-layout-sider-children",
+
+                                   researchAsstAnchor:"div.symbol div.icons-list",
+                                   researchAsstPlacement: function(jNode) {return jNode;},
+                                   theAbbreviation:function(jNode){var thisHREF= $("#chart-header section.chart-options a:first-child").attr("href");  return thisHREF.substring(thisHREF.lastIndexOf(":")+1);},
+                                   theContract:function(jNode){var thisHREF= jNode.children("a:first-child").attr('href'); return thisHREF.substring(thisHREF.lastIndexOf("/")+1);},
+                                   thePair:function(jNode) {var thisHREF=document.location.href; return thisHREF.substring(thisHREF.lastIndexOf("/")+1);},
+                                   customWaitElements:
+                                   { ".circle":addLogo}
 
 
-
-             var newVersionAvail="";
-             var newVersionHistory="";
-             var newVersionURL = "https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js";
-             GM.xmlHttpRequest({
-                 method: "GET",
-                 url:newVersionURL,
-                 onload: function(scrptTxt) {
-                     var versionMtch = scrptTxt.response.match(/\/\/\s+@version\s+(.+)/i);
-                     newVersionHistory = encodeURIComponent(scrptTxt.response.match(/var thisHistory= encodeURIComponent\(\`([\s\S]+?)\`/i)[1]);
-                     if (versionMtch  &&  versionMtch.length > 1) {
-                         newVersionAvail = encodeURIComponent(versionMtch[1]);
-                         if(newVersionAvail!=currentVersion) {waitForKeyElements('span#newVersion',addNewVersion);}
-                     };
-                 }
-             });
-
-
-             function addNewVersion (jNode) {
-                 jNode.html('<a title="update DYORassistant" href="'+newVersionURL+'" class="AP_DAJS_element">v '+newVersionAvail.replace(/ALPHA-/gi,'')+' available</a>');
-                 //yeah, it's hinky. This runs asynchronously so there's two different places this can happen: here, or synchronously down below.
-             }
-
-             var IDcounter=1
-
-             // Hash any string into an integer value
-             // Then we'll use the int and convert to hex.
-             function hashCode(str) {
-                 var hash = 0;
-                 for (var i = 0; i < str.length; i++) {
-                     hash = str.charCodeAt(i) + ((hash << 5) - hash);
-                 }
-                 return hash;
-             }
-
-             // Convert an int to hexadecimal with a max length
-             // of six characters.
-             function intToARGB(i) {
-                 var hex = (((i>>24)&0xCC)+0x33).toString(16) +
-                     (((i>>16)&0x9E)+0x33).toString(16) +
-                     (((i>>8)&0x9E)+0x33).toString(16) +
-                     ((i&0x9E)+0x33).toString(16);
-                 // Sometimes the string returned will be too short so we
-                 // add zeros to pad it out, which later get removed if
-                 // the length is greater than six.
-                 hex += '000000';
-                 var theReturn = hex.substring(0, 6).replace("b","3").replace("c","5").replace("d","7").replace("e","9").replace("f","a"); //make a little darker
-
-                 //   theReturn = (((theReturn & 0x7E7E7E) >> 1) | (col & 0x808080)) ;//darken it
-                 return theReturn;
-             }
-
-             // Extend the string type to allow converting to hex for quick access.
-             String.prototype.toHexColour = function() {
-                 return intToARGB(hashCode(this));
-             }
-
-             window.thisHistory=thisHistory;
+                                  }
+                                 };
 
 
 
-             function quoteFunction(funcCall){
-                 //from https://coursesweb.net/javascript/replace-javascript-variable-name-from-string-with-value_cs
-                 var str=funcCall.toString();
 
-                 // JavaScript & jQuery Courses - https://coursesweb.net/javascript/
-                 str = str.replace(/\$\{(.*?)\}/gi, function(a,b) {
-                     // if token is an array item, else, is object property, or variable
-                     if(b.match(/[a-z0-9_]+\[[a-z0-9_]+\]/i)) {
-                         var arritm = b.match(/([a-z0-9_]+)\[([a-z0-9_]+)\]/i);      // gets an array with the matched items
-                         return window[arritm[1]][arritm[2]];
-                     }
-                     else {
-                         var voitm = b.split('.');
-                         return (voitm.length == 2) ? window[voitm[0]][voitm[1]] : window[voitm[0]];
+
+                 var newVersionAvail="";
+                 var newVersionHistory="";
+                 var newVersionURL = "https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js";
+                 GM.xmlHttpRequest({
+                     method: "GET",
+                     url:newVersionURL,
+                     onload: function(scrptTxt) {
+                         var versionMtch = scrptTxt.response.match(/\/\/\s+@version\s+(.+)/i);
+                         newVersionHistory = encodeURIComponent(scrptTxt.response.match(/var thisHistory= encodeURIComponent\(\`([\s\S]+?)\`/i)[1]);
+                         if (versionMtch  &&  versionMtch.length > 1) {
+                             newVersionAvail = encodeURIComponent(versionMtch[1]);
+                             if(newVersionAvail!=currentVersion) {waitForKeyElementsWrapper('span#newVersion',addNewVersion);}
+                         };
                      }
                  });
 
-                 return str;
-             }
+
+                 function addNewVersion (jNode) {
+                     jNode.html('<a title="update DYORassistant" href="'+newVersionURL+'" class="AP_DAJS_element">v '+newVersionAvail.replace(/ALPHA-/gi,'')+' available</a>');
+                     //yeah, it's hinky. This runs asynchronously so there's two different places this can happen: here, or synchronously down below.
+                 }
+
+                 var IDcounter=1
+
+                 // Hash any string into an integer value
+                 // Then we'll use the int and convert to hex.
+                 function hashCode(str) {
+                     var hash = 0;
+                     for (var i = 0; i < str.length; i++) {
+                         hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                     }
+                     return hash;
+                 }
+
+                 // Convert an int to hexadecimal with a max length
+                 // of six characters.
+                 function intToARGB(i) {
+                     var hex = (((i>>24)&0xCC)+0x33).toString(16) +
+                         (((i>>16)&0x9E)+0x33).toString(16) +
+                         (((i>>8)&0x9E)+0x33).toString(16) +
+                         ((i&0x9E)+0x33).toString(16);
+                     // Sometimes the string returned will be too short so we
+                     // add zeros to pad it out, which later get removed if
+                     // the length is greater than six.
+                     hex += '000000';
+                     var theReturn = hex.substring(0, 6).replace("b","3").replace("c","5").replace("d","7").replace("e","9").replace("f","a"); //make a little darker
+
+                     //   theReturn = (((theReturn & 0x7E7E7E) >> 1) | (col & 0x808080)) ;//darken it
+                     return theReturn;
+                 }
+
+                 // Extend the string type to allow converting to hex for quick access.
+                 String.prototype.toHexColour = function() {
+                     return intToARGB(hashCode(this));
+                 }
+
+                 window.thisHistory=thisHistory;
 
 
-             function addJS_Node (text, s_URL, funcToRun) {
-                 var D                                   = document;
-                 var scriptNode                          = D.createElement ('script');
-                 scriptNode.type                         = "text/javascript";
-                 if (text)       scriptNode.textContent  = text;
-                 if (s_URL)      scriptNode.src          = s_URL;
-                 if (funcToRun)  scriptNode.textContent  = quoteFunction(funcToRun);
 
-                 var targ = D.getElementsByTagName ('head')[0] || D.body || D.documentElement;
-                 targ.appendChild (scriptNode);
-             }
+                 function quoteFunction(funcCall){
+                     //from https://coursesweb.net/javascript/replace-javascript-variable-name-from-string-with-value_cs
+                     var str=funcCall.toString();
 
+                     // JavaScript & jQuery Courses - https://coursesweb.net/javascript/
+                     str = str.replace(/\$\{(.*?)\}/gi, function(a,b) {
+                         // if token is an array item, else, is object property, or variable
+                         if(b.match(/[a-z0-9_]+\[[a-z0-9_]+\]/i)) {
+                             var arritm = b.match(/([a-z0-9_]+)\[([a-z0-9_]+)\]/i);      // gets an array with the matched items
+                             return window[arritm[1]][arritm[2]];
+                         }
+                         else {
+                             var voitm = b.split('.');
+                             return (voitm.length == 2) ? window[voitm[0]][voitm[1]] : window[voitm[0]];
+                         }
+                     });
 
-             /********************** Functions to include in pages **********************/
-             function AP_DAJS_displayHistory(){
-                 win=window.open("", 'DYORa Version History', 'width=700, height=700, right=24, top=24, scrollbars, resizable');
-                 win.document.write('<html><body><pre>'+decodeURIComponent(`${thisHistory}`)+'</pre></body></html>');return false;
-
-             }
-             addJS_Node(null, null, AP_DAJS_displayHistory);
-
-             function AP_DAJS_upgradeVersion(){
-                 win=window.open("", 'DYORa Version Upgrade', 'width=700, height=700, right=24, top=24, scrollbars, resizable');
-                 win.document.write('<html><body>Installed version: '+decodeURIComponent(`${currentVersion}`)+'<br>Available version: '+decodeURIComponent(`${newVersionAvail}`)+'< a href="'+decodeURIComponent(`${newVersionAvail}`)+'">click to install upgrade</a> (<a href="'+decodeURIComponent(`${newVersionAvail}.replace(/\/raw\//i,'/blob/')`)+'">source</a>)<br><small>After upgrading, please close this window and refresh the browser page you came from.</small><p><pre>'+decodeURIComponent(`${thisHistory}`)+'</pre></body></html>');return false;
-
-             }
-
-             addJS_Node(null, null, AP_DAJS_upgradeVersion);
+                     return str;
+                 }
 
 
-             function AP_DAJS_sortTable(n,tableId) {
-                 var table = document.getElementById(tableId);
-                 document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle(".sorting");
-                 window.setTimeout(AP_DAJS_sortTableMain(n,tableId), 100);
-                 return;}
+                 function addJS_Node (text, s_URL, funcToRun) {
+                     var D                                   = document;
+                     var scriptNode                          = D.createElement ('script');
+                     scriptNode.type                         = "text/javascript";
+                     if (text)       scriptNode.textContent  = text;
+                     if (s_URL)      scriptNode.src          = s_URL;
+                     if (funcToRun)  scriptNode.textContent  = quoteFunction(funcToRun);
 
-             addJS_Node(null, null, AP_DAJS_sortTable);
+                     var targ = D.getElementsByTagName ('head')[0] || D.body || D.documentElement;
+                     targ.appendChild (scriptNode);
+                 }
 
 
 
-             function AP_DAJS_sortTableMain(n,tableId) {
-                 var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-                 table = document.getElementById(tableId);
-                 try { document.getElementById("AP_DAJS_th"+tableId+table.getAttribute("lastSortedBy")).textContent="⇅";
-                      document.getElementById("AP_DAJS_th"+tableId+table.getAttribute("lastSortedBy")).classList.toggle("text-info");
-                     } catch(e) {};
-                 table.setAttribute("lastSortedBy",n);
+
+                 /********************** Functions to include in pages **********************/
+                 function AP_DAJS_displayHistory(){
+                     win=window.open("", 'DYORa Version History', 'width=700, height=700, right=24, top=24, scrollbars, resizable');
+                     win.document.write('<html><body><pre>'+decodeURIComponent(`${thisHistory}`)+'</pre></body></html>');return false;
+
+                 }
+                 addJS_Node(null, null, AP_DAJS_displayHistory);
+
+                 function AP_DAJS_upgradeVersion(){
+                     win=window.open("", 'DYORa Version Upgrade', 'width=700, height=700, right=24, top=24, scrollbars, resizable');
+                     win.document.write('<html><body>Installed version: '+decodeURIComponent(`${currentVersion}`)+'<br>Available version: '+decodeURIComponent(`${newVersionAvail}`)+'< a href="'+decodeURIComponent(`${newVersionAvail}`)+'">click to install upgrade</a> (<a href="'+decodeURIComponent(`${newVersionAvail}.replace(/\/raw\//i,'/blob/')`)+'">source</a>)<br><small>After upgrading, please close this window and refresh the browser page you came from.</small><p><pre>'+decodeURIComponent(`${thisHistory}`)+'</pre></body></html>');return false;
+
+                 }
+
+                 addJS_Node(null, null, AP_DAJS_upgradeVersion);
 
 
-                 switching = true;
-                 // Set the sorting direction to ascending:
-                 dir = "asc";
-                 /* Make a loop that will continue until no switching has been done: */
-                 while (switching) {
-                     // Start by saying: no switching is done:
-                     switching = false;
-                     rows = table.rows;
-                     /* Loop through all table rows (except the
+                 function AP_DAJS_sortTable(n,tableId) {
+                     var table = document.getElementById(tableId);
+                     document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle(".sorting");
+                     window.setTimeout(AP_DAJS_sortTableMain(n,tableId), 100);
+                     return;}
+
+                 addJS_Node(null, null, AP_DAJS_sortTable);
+
+
+
+                 function AP_DAJS_sortTableMain(n,tableId) {
+                     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                     table = document.getElementById(tableId);
+                     try { document.getElementById("AP_DAJS_th"+tableId+table.getAttribute("lastSortedBy")).textContent="⇅";
+                          document.getElementById("AP_DAJS_th"+tableId+table.getAttribute("lastSortedBy")).classList.toggle("text-info");
+                         } catch(e) {};
+                     try {  table.setAttribute("lastSortedBy",n); } catch (e) {errorLog("line 471 failure ",e);}
+
+
+                     switching = true;
+                     // Set the sorting direction to ascending:
+                     dir = "asc";
+                     /* Make a loop that will continue until no switching has been done: */
+                     while (switching) {
+                         // Start by saying: no switching is done:
+                         switching = false;
+                         rows = table.rows;
+                         /* Loop through all table rows (except the
     first, which contains table headers): */
-                     for (i = 1; i < (rows.length - 1); i++) {
-                         // Start by saying there should be no switching:
-                         shouldSwitch = false;
-                         /* Get the two elements you want to compare,
+                         for (i = 1; i < (rows.length - 1); i++) {
+                             // Start by saying there should be no switching:
+                             shouldSwitch = false;
+                             /* Get the two elements you want to compare,
       one from current row and one from the next: */
-                         x = rows[i].getElementsByTagName("TD")[n];
-                         y = rows[i + 1].getElementsByTagName("TD")[n];
-                         /* Check if the two rows should switch place,
+                             x = rows[i].getElementsByTagName("TD")[n];
+                             y = rows[i + 1].getElementsByTagName("TD")[n];
+                             /* Check if the two rows should switch place,
       based on the direction, asc or desc: */
-                         xValue=isNaN(x.getAttribute('AP_DAJS_valueCalc'))?x.getAttribute('AP_DAJS_valueCalc') :(+x.getAttribute('AP_DAJS_valueCalc') );
-                         yValue=isNaN(y.getAttribute('AP_DAJS_valueCalc'))?y.getAttribute('AP_DAJS_valueCalc') :(+y.getAttribute('AP_DAJS_valueCalc') );
-                         if (dir == "asc") {
-                             if (xValue < yValue) {
-                                 // If so, mark as a switch and break the loop:
-                                 shouldSwitch = true;
-                                 break;
-                             }
-                         } else if (dir == "desc") {
-                             if (xValue > yValue) {
-                                 // If so, mark as a switch and break the loop:
-                                 shouldSwitch = true;
-                                 break;
+                             xValue=isNaN(x.getAttribute('AP_DAJS_valueCalc'))?x.getAttribute('AP_DAJS_valueCalc') :(+x.getAttribute('AP_DAJS_valueCalc') );
+                             yValue=isNaN(y.getAttribute('AP_DAJS_valueCalc'))?y.getAttribute('AP_DAJS_valueCalc') :(+y.getAttribute('AP_DAJS_valueCalc') );
+                             if (dir == "asc") {
+                                 if (xValue < yValue) {
+                                     // If so, mark as a switch and break the loop:
+                                     shouldSwitch = true;
+                                     break;
+                                 }
+                             } else if (dir == "desc") {
+                                 if (xValue > yValue) {
+                                     // If so, mark as a switch and break the loop:
+                                     shouldSwitch = true;
+                                     break;
+                                 }
                              }
                          }
-                     }
-                     if (shouldSwitch) {
-                         /* If a switch has been marked, make the switch
+                         if (shouldSwitch) {
+                             /* If a switch has been marked, make the switch
       and mark that a switch has been done: */
-                         rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                         switching = true;
-                         // Each time a switch is done, increase this count by 1:
-                         switchcount ++;
-                     } else {
-                         /* If no switching has been done AND the direction is "asc",
-      set the direction to "desc" and run the while loop again. */
-                         if (switchcount == 0 && dir == "asc") {
-                             dir = "desc";
+                             rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
                              switching = true;
-                         }
-                     }
-                 }
-                 document.getElementById("AP_DAJS_th"+tableId+n).textContent=(dir=="desc"?"↓":"↑");
-                 document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle("text-info");
-                 document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle(".sorting");
-             }
-
-             addJS_Node(null, null, AP_DAJS_sortTableMain);
-
-             function AP_DAJS_previewToggle (thisCounter,url,section){
-                 if(document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display=='block'
-                    && document.getElementById('AP_DAJS_results'+thisCounter).src==decodeURIComponent(url))
-                 {document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display='none';
-                  document.getElementById('AP_DAJS_floaterlink'+section+thisCounter).innerHTML='&gt;🔎'}
-                 else
-                 {document.getElementById('AP_DAJS_results'+thisCounter).src=decodeURIComponent(url);
-                  document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display='block';
-                  document.getElementById('AP_DAJS_floaterlink'+section+thisCounter).innerHTML='&lt;🔍'}
-             }
-             addJS_Node(null, null, AP_DAJS_previewToggle);
-
-             function AP_DAJS_filterFunction(filterOn,tableId,theColor) {
-                 var filterAddr=filterOn;//filterOn.parentNode.getAttribute("ap_dajs_valuecalc");
-                 var thisIndex = Array.from(filterOn.parentNode.parentNode.children).indexOf(filterOn.parentNode);
-                 if (typeof window.filterState === 'undefined') {window.filterState="";}
-                 var filter= (window.filterState=="")?filterAddr:"";
-                 window.filterState=filter;
-                 var  table, tr, td, i, txtValue;
-                 table = document.getElementById(tableId);
-
-
-                 tr = table.getElementsByTagName("tr");
-                 var hTD = table.getElementsByTagName("th")[thisIndex];
-
-                 for (i = 0; i < tr.length; i++) {
-                     td = tr[i].getElementsByTagName("td")[thisIndex];
-                     if (td) {
-                         txtValue = td.getAttribute("ap_dajs_valuecalc"); //td.textContent || td.innerText;
-                         if (txtValue.indexOf(filter) > -1 || filter=="" ) {
-                             tr[i].style.display = "";
+                             // Each time a switch is done, increase this count by 1:
+                             switchcount ++;
                          } else {
-                             tr[i].style.display = "none";
+                             /* If no switching has been done AND the direction is "asc",
+      set the direction to "desc" and run the while loop again. */
+                             if (switchcount == 0 && dir == "asc") {
+                                 dir = "desc";
+                                 switching = true;
+                             }
                          }
                      }
+                     document.getElementById("AP_DAJS_th"+tableId+n).textContent=(dir=="desc"?"↓":"↑");
+                     document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle("text-info");
+                     document.getElementById("AP_DAJS_th"+tableId+n).classList.toggle(".sorting");
                  }
-                 if (filter == "") {hTD.innerHTML = hTD.getAttribute("oldText");} else {hTD.setAttribute("oldText",hTD.innerHTML);hTD.innerHTML = 'Maker <span style="color:#'+theColor+' !important" class="AP_DAJS_element">'+filter+' only</span>';}
-             }
-             addJS_Node(null, null, AP_DAJS_filterFunction);
-             /********************** end Functions to include in pages **********************/
+
+                 addJS_Node(null, null, AP_DAJS_sortTableMain);
+
+                 function AP_DAJS_previewToggle (thisCounter,url,section){
+                     if(document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display=='block'
+                        && document.getElementById('AP_DAJS_results'+thisCounter).src==decodeURIComponent(url))
+                     {document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display='none';
+                      document.getElementById('AP_DAJS_floaterlink'+section+thisCounter).innerHTML='&gt;🔎'}
+                     else
+                     {document.getElementById('AP_DAJS_results'+thisCounter).src=decodeURIComponent(url);
+                      document.getElementById('AP_DAJS_previewResults'+thisCounter).style.display='block';
+                      document.getElementById('AP_DAJS_floaterlink'+section+thisCounter).innerHTML='&lt;🔍'}
+                 }
+                 addJS_Node(null, null, AP_DAJS_previewToggle);
+
+                 function AP_DAJS_filterFunction(filterOn,tableId,theColor) {
+                     var filterAddr=filterOn;//filterOn.parentNode.getAttribute("ap_dajs_valuecalc");
+                     var thisIndex = Array.from(filterOn.parentNode.parentNode.children).indexOf(filterOn.parentNode);
+                     if (typeof window.filterState === 'undefined') {window.filterState="";}
+                     var filter= (window.filterState=="")?filterAddr:"";
+                     window.filterState=filter;
+                     var  table, tr, td, i, txtValue;
+                     table = document.getElementById(tableId);
+
+
+                     tr = table.getElementsByTagName("tr");
+                     var hTD = table.getElementsByTagName("th")[thisIndex];
+
+                     for (i = 0; i < tr.length; i++) {
+                         td = tr[i].getElementsByTagName("td")[thisIndex];
+                         if (td) {
+                             txtValue = td.getAttribute("ap_dajs_valuecalc"); //td.textContent || td.innerText;
+                             if (txtValue.indexOf(filter) > -1 || filter=="" ) {
+                                 tr[i].style.display = "";
+                             } else {
+                                 tr[i].style.display = "none";
+                             }
+                         }
+                     }
+                     if (filter == "") {hTD.innerHTML = hTD.getAttribute("oldText");} else {
+                         try {hTD.setAttribute("oldText",hTD.innerHTML);} catch (e) {errorLog("line 569 failure ",e);}
+                         hTD.innerHTML = 'Maker <span style="color:#'+theColor+' !important" class="AP_DAJS_element">'+filter+' only</span>';}
+                 }
+                 addJS_Node(null, null, AP_DAJS_filterFunction);
+                 /********************** end Functions to include in pages **********************/
 
 
 
-             function timeStringToSeconds (timeString) {
+                 function timeStringToSeconds (timeString) {
 
-                 var hms = timeString.replace(/ *[hmdHMD] */g,":").replace(/ *[s] *$/g,"");   // your input string
-                 var a = hms.split(':'); // split it at the colons
-                 // minutes are worth 60 seconds. Hours are worth 60 minutes.
-                 var seconds = (typeof a[3] !== "undefined")?(+a[0]) * 60 * 60 * 60 + (+a[1]) * 60 + (+a[2])*60+(+a[3]):(typeof a[2] !== "undefined")?(+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]):
-                 (typeof a[1] !== "undefined")?(+a[0]) * 60+ (+a[1]):(+a[0]);
-
-
-                 return(seconds);
-             }
-
-             waitForKeyElements ( "thead>tr>th, ngx-datatable", prepareTable);
-             waitForKeyElements ("td,datatable-body-cell", setTDvalue);
-
-             waitForKeyElements ( ".circle", addLogo);
-             waitForKeyElements ( "span.copyright.ml-auto.my-auto.mr-2", addDisclaimer);
-             waitForKeyElements ( "body:not([AP_DAJS_pageType='pool']) a[href*='/address/0x']", prepareEtherscanLink);
-             waitForKeyElements ( ".AP_DAJS_dependentElement:not(.AP_DAJS_dependency+.AP_DAJS_dependentElement)",removeDependency)
-
-             function removeDependency(jNode) {
-                 jNode.remove();
-             }
-
-             function prepareEtherscanLink(jNode) {
-                 var thisNode = jNode;
-                 var thisHREF = thisNode.attr('href');
-                 var theHex= /0\x[0-9a-f]+/i.exec(thisHREF)[0];
-                 try {var theTest=theHex.length;
-                      thisNode.attr('style','color: #'+theHex.toHexColour()+' !important');
-                      try { if( thisNode.closest("TD,datatable-body-cell").length) {
-                          var thisIndex=thisNode.closest("TD,datatable-body-cell").index();
-                          var theTable=thisNode.closest("table,ngx-datatable").attr('id');
-                          var theDupeCount=$("#"+theTable+" a[href='"+thisHREF+"']").length;
-                          if (theDupeCount>1 && document.body.getAttribute("AP_DAJS_pageType") != 'pair' )
-/* we're not going to do this on DEXtools pair page anymore, the dynamically generated data table rows are bogus. */
- {
-                              thisNode.parent().prepend('<i title="filter on this address" class="AP_DAJS_element AP_DAJS_clickable filterbutton fa fa-filter pools-icon-warning" onclick="AP_DAJS_filterFunction('+thisNode.closest("table,ngx-datatable").attr("ap_dajs_valuecalc")+',\''+thisNode.closest("table,ngx-datatable").attr("id")+'\',\''+theHex.toHexColour()+'\')"><sup style="font-size:.5em;">'+theDupeCount+'</sup></i>'); }
-                      }} catch (e) {console.log("ERROR - theHex",theHex);console.log(e);}
-                      //style="background:#'+theHex.toHexColour()+' !important"
-                      //  jNode.closest("td").next().attr('style','background: #'+theHex.toHexColsorttour()+' !important');
-
-                      thisNode.after('<a title="Zerion wallet overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_popupItem AP_DAJS_popupWin"'
-                                     +' href="https://app.zerion.io/'+theHex+'/overview">'
-                                     +' <div class="AP_DAJS_element backImgSmol zeriImg hide"></div></a>');
-                      thisNode.addClass('AP_DAJS_dependency');
-
-                     } catch(e) {}
-
-             }
-
-             function setTDvalue(jNode) {
-                 var rightNow = (new Date().getTime()/1000 );
-
-                 var thisTD=jNode.clone();
-                 thisTD.find(".AP_DAJS_element").remove();
-
-                 jNode.attr("AP_DAJS_valueCalc",
-                            ( thisTD.text()!="" && thisTD.text().replace(/[ 0-9hdmsHDMS]*/g,"")=="" )?
-                            timeStringToSeconds(thisTD.text()):
-                            (isNaN(thisTD.text().replace(/[$,]/g,"")))?thisTD.text().toLowerCase().replace(/ /g,""):parseFloat(thisTD.text().replace(/[$,]/g,""))
-                           ); /*convert relative times to epoch time so don't have to worry about cell relative value updating, as it does. */
+                     var hms = timeString.replace(/ *[hmdHMD] */g,":").replace(/ *[s] *$/g,"");   // your input string
+                     var a = hms.split(':'); // split it at the colons
+                     // minutes are worth 60 seconds. Hours are worth 60 minutes.
+                     var seconds = (typeof a[3] !== "undefined")?(+a[0]) * 60 * 60 * 60 + (+a[1]) * 60 + (+a[2])*60+(+a[3]):(typeof a[2] !== "undefined")?(+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]):
+                     (typeof a[1] !== "undefined")?(+a[0]) * 60+ (+a[1]):(+a[0]);
 
 
-
-                 /* now some special general formatting */
-                 if (jNode.attr("AP_DAJS_valueCalc")=="sell") {makeRed(jNode);}
-                 if (jNode.attr("AP_DAJS_valueCalc")=="buy") {makeGreen(jNode);}
-
-                 return true;
-                 /* jNode.on('DOMSubtreeModified', setTDvalue(jNode)); NOPE! Infinit loop */
-             }
-
-             function prepareTable (jNode) {
-                 if (!jNode.closest("table,ngx-datatable").attr("id"))
-                 {  jNode.closest("table,ngx-datatable").attr("id",Math.floor(Math.random() * Math.floor(Math.random() * Date.now())));}
-             if (jNode.prop("tagName") == "TH") {
-                 jNode.addClass("AP_DAJS_clickable");
-                 jNode.attr("onclick","AP_DAJS_sortTable("+jNode.index()+","+jNode.closest("table,ngx-datatable").attr("id")+")");
-                 jNode.append('<span class="AP_DAJS_element DAsorter" id="AP_DAJS_th'+jNode.closest("table,ngx-datatable").attr("id")+jNode.index()+'">⇅</span>');
-
-             }}
+                     return(seconds);
+                 }
 
 
-             /* Watch for window URL change: */
-             history.pushState = ( function (f) {return function pushState(){
-                 var ret = f.apply(this, arguments);
-                 window.dispatchEvent(new Event('pushstate'));
-                 window.dispatchEvent(new Event('locationchange'));
-                 return ret;
-             }})(history.pushState);
+                 /* general */
+                 waitForKeyElementsWrapper ("body[ap_dajs_pagetype]",pageSpecificElements);
+                 waitForKeyElementsWrapper ( "thead>tr>th, ngx-datatable", prepareTable);
+                 waitForKeyElementsWrapper ("td,datatable-body-cell", setTDvalue);
+                 errorLog(JSON.parse(JSON.stringify(thisPageOptions())));
 
-             history.replaceState = ( function (f) { return function replaceState(){
-                 var ret = f.apply(this, arguments);
-                 window.dispatchEvent(new Event('replacestate'));
-                 window.dispatchEvent(new Event('locationchange'));
-                 return ret;
-             }})(history.replaceState);
+                 waitForKeyElementsWrapper ( "a[href*='/address/0x']:not(.AP_DAJS_ethPrepared):not(.AP_DAJS_element)", prepareEtherscanLink);
+                 waitForKeyElementsWrapper ( ".AP_DAJS_dependentElement:not(.AP_DAJS_dependency+.AP_DAJS_dependentElement)",removeDependency)
+                 waitForKeyElementsWrapper ( "#AP_DAJS_popupframe[src='']", togglePreview);
+                 errorLog("RAA");
+                 errorLog(thisPageOptions());
 
-             window.addEventListener('popstate',function(){ return function(){
-                 window.dispatchEvent(new Event('locationchange'))
-             }});
+                 function pageSpecificElements() {
+                 waitForKeyElementsWrapper ( thisPageOptions().researchAsstAnchor, addGoog);
+                 waitForKeyElementsWrapper ( thisPageOptions().addDisclaimerAnchor, addDisclaimer);
+                 }
+                 /* DT pool */
 
+                 /* end DT pool */
+                 function waitForKeyElementsWrapper(theSelector,theFunc) {
+                     try {
+                         if(typeof theSelector != "undefined") {
+                             //  errorLog("Starting WFKE "+theSelector+theFunc.name);
+                             waitForKeyElements (theSelector,theFunc);
+                             errorLog("ENDINg WFKE "+theSelector+' '+theFunc.name);
+                         } } catch(e) {errorLog(e);}
+                 }
 
-             window.addEventListener('locationchange', function(){
-                 initPage();
-             })
+                 function removeDependency(jNode) {
+                     jNode.remove();
+                 }
 
+                 function prepareEtherscanLink(jNode) {
+jNode.addClass("AP_DAJS_ethPrepared");
 
-             /* End Watch for window URL change. from https://stackoverflow.com/questions/6390341/how-to-detect-if-url-has-changed-after-hash-in-javascript/52809105#52809105 */
+                     var thisNode = jNode;
+                     try { var thisHREF = thisNode.attr('href'); } catch (e) {errorLog("href not found"); return false}
+                     //really stupid, but somehow waitForKeyElementsWrapper is sometimes passing empty nodes
+                     /*    errorLog (JSON.parse(JSON.stringify(jNode)));
+                 errorLog (typeof jNode.attr('href'));
+                 errorLog("a");
+                 errorLog ( jNode.attr('href'));
+                 errorLog("b");
+                 errorLog (thisHREF);
+                 errorLog("c");
+                 errorLog(/0\x[0-9a-f]+/i.exec(thisHREF));
+                 errorLog("d");
+                 errorLog(/0\x[0-9a-f]+/i.exec(thisHREF)[0]);
+                 errorLog("e"); */
+                     var theHex= /0\x[0-9a-f]+/i.exec(thisHREF)[0];
+                     /*                 errorLog("f");
+                 errorLog(theHex); */
+                     //   try {
+                     var theTest=theHex.length;
+                     thisNode.attr('style','color: #'+theHex.toHexColour()+' !important');
+                     try {
+                         if( thisNode.closest("TD,datatable-body-cell").length && !pageHasFeature("noListFilter")) {
+                             var thisIndex=thisNode.closest("TD,datatable-body-cell").index();
+                             var theTable=thisNode.closest("table,ngx-datatable").attr('id');
+                             var theDupeCount=$("#"+theTable+" a[href='"+thisHREF+"']").length;
+                             if (theDupeCount>1 )
+                                 /* we're not going to do this on DEXtools pair page anymore, the dynamically generated data table rows are bogus. */
+                             {
+                                 thisNode.parent().prepend('<i title="filter on this address" class="AP_DAJS_element AP_DAJS_clickable filterbutton fa fa-filter pools-icon-warning" onclick="AP_DAJS_filterFunction('+thisNode.closest("table,ngx-datatable").attr("ap_dajs_valuecalc")+',\''+thisNode.closest("table,ngx-datatable").attr("id")+'\',\''+theHex.toHexColour()+'\')"><sup style="font-size:.5em;">'+theDupeCount+'</sup></i>'); }
+                         }} catch (e) {console.log("ERROR - theHex",theHex);console.log(e);}
+                     //style="background:#'+theHex.toHexColour()+' !important"
+                     //  jNode.closest("td").next().attr('style','background: #'+theHex.toHexColsorttour()+' !important');
 
-
-             window.addEventListener('popstate', function (event) {
-                 // back and forward buttons, etc.
-                 initPage();
-             });
-
-             function initPage(){
-
-                 var pageCodes = {pair:{url:"www.dextools.io/app/uniswap/pair-explorer"},
-                                  pool:{url:"www.dextools.io/app/uniswap/pool-explorer"},
-astropair:{url:"//app.astrotools.io/pair-explorer"}};
-
-                 var thisPage="all";
-                 for (const prop in pageCodes) {
-                     if(document.location.href.match(pageCodes[prop].url)) {
-                         thisPage=prop;}
+                     jNode.after(zerionLink (theHex));
+                     jNode.addClass('AP_DAJS_dependency');
+                     //   } catch(e) {errorLog("605 error fail",e);}
 
                  }
-                 document.body.setAttribute("AP_DAJS_pageType",thisPage);
 
-                 if(thisPage=="pool"){
-                     /************************ pool page functions ************************/
-                     $(document).ready(function(){
-                         $(document.head).append(`
+
+                 function zerionLink (theHex) {
+                     if (!pageHasFeature("noZerion")){
+                         return ('<a title="Zerion address overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_dependency AP_DAJS_popupItem AP_DAJS_popupWin"'
+                                 +' href="https://app.zerion.io/'+theHex+'/overview">'
+                                 +' <div class="AP_DAJS_element backImgSmol zeriImg hide"></div></a>');
+                     }
+   if (!pageHasFeature("noEthplorer")){
+                         return ('<a title="Ethplorer address overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_popupItem AP_DAJS_popupWin"'
+                                 +' href="https://ethplorer.io/address/'+theHex+'">'
+                                 +' <div class="AP_DAJS_element backImgSmol ethpImg hide"></div></a>');
+                     }
+
+                 }
+
+                 function setTDvalue(jNode) {
+                     var rightNow = (new Date().getTime()/1000 );
+
+                     var thisTD=jNode.clone();
+                     thisTD.find(".AP_DAJS_element").remove();
+
+                     jNode.attr("AP_DAJS_valueCalc",
+                                ( thisTD.text()!="" && thisTD.text().replace(/[ 0-9hdmsHDMS]*/g,"")=="" )?
+                                timeStringToSeconds(thisTD.text()):
+                                (isNaN(thisTD.text().replace(/[$,]/g,"")))?thisTD.text().toLowerCase().replace(/ /g,""):parseFloat(thisTD.text().replace(/[$,]/g,""))
+                               ); /*convert relative times to epoch time so don't have to worry about cell relative value updating, as it does. */
+
+
+
+                     /* now some special general formatting */
+                     if (jNode.attr("AP_DAJS_valueCalc")=="sell") {makeRed(jNode);}
+                     if (jNode.attr("AP_DAJS_valueCalc")=="buy") {makeGreen(jNode);}
+
+                     return true;
+                     /* jNode.on('DOMSubtreeModified', setTDvalue(jNode)); NOPE! Infinit loop */
+                 }
+
+                 function prepareTable (jNode) {
+                     if (!jNode.closest("table,ngx-datatable").attr("id"))
+                     {  jNode.closest("table,ngx-datatable").attr("id",Math.floor(Math.random() * Math.floor(Math.random() * Date.now())));}
+
+                     if ((typeof thisPageOptions().onlySortColumns=="undefined" && jNode.prop("tagName")=="TH") || jNode.is(thisPageOptions().onlySortColumns) ) {
+                         jNode.addClass("AP_DAJS_clickable");
+                         jNode.attr("onclick","AP_DAJS_sortTable("+jNode.index()+","+jNode.closest("table,ngx-datatable").attr("id")+")");
+                         jNode.append('<span class="AP_DAJS_element DAsorter" id="AP_DAJS_th'+jNode.closest("table,ngx-datatable").attr("id")+jNode.index()+'">⇅</span>');
+
+                     }}
+
+
+                 /* Watch for window URL change: */
+                 history.pushState = ( function (f) {return function pushState(){
+                     var ret = f.apply(this, arguments);
+                     window.dispatchEvent(new Event('pushstate'));
+                     window.dispatchEvent(new Event('locationchange'));
+                     return ret;
+                 }})(history.pushState);
+
+                 history.replaceState = ( function (f) { return function replaceState(){
+                     var ret = f.apply(this, arguments);
+                     window.dispatchEvent(new Event('replacestate'));
+                     window.dispatchEvent(new Event('locationchange'));
+                     return ret;
+                 }})(history.replaceState);
+
+                 window.addEventListener('popstate',function(){ return function(){
+                     window.dispatchEvent(new Event('locationchange'))
+                 }});
+
+
+                 window.addEventListener('locationchange', function(){
+                     initPage();
+                 })
+
+
+                 /* End Watch for window URL change. from https://stackoverflow.com/questions/6390341/how-to-detect-if-url-has-changed-after-hash-in-javascript/52809105#52809105 */
+
+
+                 window.addEventListener('popstate', function (event) {
+                     // back and forward buttons, etc.
+                     initPage();
+                 });
+
+
+
+                 function pageHasFeature (featureCode) {
+                     try {
+
+                         var pageFeatures = pageCodes[thisPage].features.includes(featureCode);
+                         return pageFeatures;}
+                     catch(e) {return false;}
+                 }
+
+                 function errorLog(thisText) {
+                     if(logErrors) {console.log(thisText);}
+
+                 }
+
+                 function thisPageOptions() {
+                     errorLog("thisPage");
+                     errorLog(thisPage);
+                     try{
+                         return pageCodes[thisPage] || {};
+
+                     } catch(e){errorLog("Body not ready");return {};}
+
+                 }
+
+
+                 function setupPageType() {
+                     for (const prop in pageCodes) {
+                         errorLog("prop");
+                         errorLog(prop);
+errorLog("URL "+document.location.href);
+                         errorLog("PROP URL "+pageCodes[prop].url);
+                         if(document.location.href.match(pageCodes[prop].url)) {
+                             thisPage=prop;errorLog("+++");}
+
+                     }
+                     errorLog("THIS PAGE");
+                     errorLog(thisPage);
+                     try{  document.body.setAttribute("AP_DAJS_pageType",thisPage);
+                        } catch(e) {
+                            errorLog("No body");
+
+                        }
+                      pageSpecificElements();
+                 }
+
+
+                 function initPage(){
+                     errorLog("PAGECODES");
+                     errorLog(JSON.parse(JSON.stringify(pageCodes)));
+
+                     setupPageType();
+                     errorLog("hey");
+                     errorLog(thisPageOptions());
+                     try{
+                         if(typeof thisPageOptions().customWaitElements != "undefined") {
+                             errorLog("xxx");
+
+                             errorLog(thisPageOptions().customWaitElements);
+                             errorLog("yyy");
+                             for (const [key, value] of Object.entries(thisPageOptions().customWaitElements)) {
+                                 errorLog( `${key}`);
+                                 errorLog(value);
+                                 waitForKeyElementsWrapper ( `${key}`, value);
+                             }
+                         }    } catch (e) {console.log("e is now ",e);}
+
+                     errorLog("2");
+                     if(thisPage=="pool"){
+                         /************************ pool page functions ************************/
+                         $(document).ready(function(){
+                             $(document.head).append(`
 <script id="AP_DAJS_poolScripts">
     async function AP_DAJS_getCCPrice(symbol,identifier) {
     var xhr = new XMLHttpRequest();
@@ -720,371 +888,381 @@ astropair:{url:"//app.astrotools.io/pair-explorer"}};
 
 </script>
 `);
-                     });
-                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4) a.badge-danger", makeRed);
-                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4) a.badge-success", makeGreen);
-                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(3)  a > i.fa-wpexplorer.pools-icon-warning:not(i.gAdded)", addGoog);
-                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(4)  i.fa-info-circle.pools-icon-warning", poolWarning);
-                     waitForKeyElements ( "body[ap_dajs_pagetype=pool] datatable-body-cell:nth-child(9)  a.badge.badge-danger", rugPull);
+                         });
 
 
-                     waitForKeyElements ( "#AP_DAJS_popupframe[src='']", togglePreview);
-                     /************************ end pool page functions ************************/
-                 }
-                 else
-                 {
-                     /************************ pair page functions ************************/
-                     $(document).ready(function(){
-                         $(document.head).append(
-                             `
+
+                         /************************ end pool page functions ************************/
+                     }
+                     else
+                     {
+                         /************************ pair page functions ************************/
+                         $(document).ready(function(){
+                             $(document.head).append(
+                                 `
 <script id="AP_DAJS_pairScripts">
 var filterState="";
 
 
 </script>
 `);
-                     });
-                    // waitForKeyElements ( "body[ap_dajs_pagetype=pair] h3.page-title>a",hiliteExtraInfo); //nth-child(2) didn't work because 2nd child isn't 'a'!
-                     waitForKeyElements ( "body[ap_dajs_pagetype=pair] h3.page-title + small",addGoog);
-                     /************************ end pair page functions ************************/
+                         });
+                         // waitForKeyElementsWrapper ( "body[ap_dajs_pagetype=pair] h3.page-title>a",hiliteExtraInfo); //nth-child(2) didn't work because 2nd child isn't 'a'!
+
+                         /************************ end pair page functions ************************/
+                     }
+
+
+                 }
+                 /********** end initPage ********/
+
+
+                 function hiliteExtraInfo(jNode) { //visually highlight when there's extra contact info for a token
+                     var thisParent=jNode.parent();
+                     if (thisParent.children("a").length>1 && !(jNode.siblings("div#contactInfoFound").length)) {
+                         thisParent.append(" <div id='contactInfoFound' class='badge badge-success'>&lt;- <small>has contact info</small><!-- &#x1F60A;--></div>");
+                     } //let's only post it once.
+                     //jNode.children("a").addClass("badge").addClass("badge-success").html(jNode.children("a").html().append("Contact info found!"));
+
+
+
                  }
 
 
-             } /*end initPage*/
+
+                 function togglePreview (jNode) {$("#AP_DAJS_preview").toggle();}
+
+                 function addLogo (jNode)
+                 {jNode.addClass("gearImg").css({"background-repeat":"no-repeat","background-position":"center"})};
+
+                 function rugPull(jNode) { if (jNode.text()=="-100%") { //var rugHTML='<span class="AP_DAJS_element text-warning badge-danger">RUGPULL</span> ';
+                     jNode.addClass("badge-dark");
+                     jNode.closest("td,datatable-body-cell").prevAll().eq(4).children(":first").children(":first").addClass("badge-dark");
+                     jNode.closest("td,datatable-body-cell").prevAll().eq(4).children(":first").children(":first").text("RUGPULL");
+                 } }
+
+                 function addLink(jNode) { var creditHTML='<div style="float:right;font-size:1.25em;" class="AP_DAJS_element"><div class="AP_DAJS_element sirImg backImg"></div> <a href="#" class="AP_DAJS_element">DYORassistant Installed</a></div>';
+                                          jNode.parent().prepend(creditHTML);
+                                         }
+                 function addDisclaimer(jNode) { var creditHTML='<div style="margin:auto 0 auto auto;" class="AP_DAJS_element text-muted bottomdiv">'
+                 +'<a id="creditlink" data-toggle="popover" data-container="body" '
+                 +'data-boundary="viewport" data-placement="top" type="button" data-html="true" href=""'
+                 +'class="AP_DAJS_element">DYORassistant</a><div class="AP_DAJS_element sirImg backImg" '
+                 +'onclick="javascript:this.classList.toggle(\'anim\');"></div> <a id="historylink" '
+                 +'data-toggle="popover" data-container="body" data-boundary="viewport" data-placement="top"'
+                 +'type="button" data-html="true" class="AP_DAJS_element" href="javascript:AP_DAJS_displayHistory()">'
+                 +currentVersion+'</a> installed <span id="newVersion" class="AP_DAJS_element"></span>'
+                 +'</div><div id="creditPopover" class="popover"></div>';
+                                                jNode.before(creditHTML);
+                                                $("div.navbar-toggler").on('click', 'div.navbar-toggler', function (e) {
+
+                                                });
+
+                                                /******** show credits ******/
+                                                var showCreditsFunction=function() { var _this = this;
+                                                                                    $("a#creditlink,a#upgradelink,a#historylink").not(this).popover('hide');
+                                                                                    $(this).popover("show");//$('#frame'+thisCounter).src='https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22';
+                                                                                    $(".popover")
+                                                                                        .on("mouseleave", function() {
+                                                                                        $(_this).popover('hide');
+                                                                                    });
+                                                                                   }
+                                                $("a#creditlink").popover({ trigger: "manual",
+                                                                           html: true,
+                                                                           animation: false,
+                                                                           sanitize:false,
+                                                                           content: function() { return '<span style="font-size:1.25em">by <a href="https://twitter.com/ApopheniaPays" target="_blank">@ApopheniaPays</a>.<p><a href="https://github.com/ApopheniaPays/dyorassistant" target="_blank">Github repo</a> - <a href="mailto:DYORfeedback@apopheniapays.com">email</a> - <a href="https://t.me/apopheniaprojects" target="_blank">Telegram Announcements</a></span>';} /* prevent duplicate elements */
+                                                                          })
+                                                    .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
+                                                    .on("click",showCreditsFunction ).on("mouseleave", function() {
+                                                    var _this = this;
+                                                    setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hixde");
+                                                                                                             }
+                                                                          }, 300);
+                                                });
+                                                /******** end credits *******/
+                                                $("a#historylink").popover({ trigger: "manual",
+                                                                            html: true,
+                                                                            animation: false,
+                                                                            sanitize:false,
+                                                                            content: function() { return "<textarea style='width:400px !important;height=600px !important;font-size=1.5em !important;' rows=25>"+decodeURIComponent(thisHistory).replace(/\n\n/g,"[BREAKHERE]").replace(/\n/g," ").replace(/  /g," ").replace(/\[BREAKHERE\]/g,"\n\n")+"</textarea>";} /* prevent duplicate elements */
+                                                                           })
+                                                    .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
+                                                    .on("click",showCreditsFunction ).on("mouseleave", function() {
+                                                    var _this = this;
+                                                    setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hidxe");
+                                                                                                             }
+                                                                          }, 300);
+                                                });
+                                                /******** end historylink *******/
+                                               }
+                 function makeRed(jNode){ var theTR=jNode.closest("TR,datatable-body-row");
+                                         theTR.addClass("redBkgd");
+                                         theTR.children("TD,datatable-body-cell").addClass("redBkgd");
+                                         theTR.children("TD,datatable-body-cell").removeClass("greenBkgd");
+                                         theTR.removeClass("greenBkgd");
+                                        }
+
+                 function makeGreen(jNode){ var theTR=jNode.closest("TR,datatable-body-row");
+                                           theTR.addClass("greenBkgd");
+                                           theTR.children("TD,datatable-body-cell").addClass("greenBkgd");
+                                           theTR.children("TD,datatable-body-cell").removeClass("redBkgd");
+                                           theTR.removeClass("redBkgd");
+                                          }
 
 
-             function hiliteExtraInfo(jNode) { //visually highlight when there's extra contact info for a token
-                 var thisParent=jNode.parent();
-                 if (thisParent.children("a").length>1 && !(jNode.siblings("div#contactInfoFound").length)) {
-                    thisParent.append(" <div id='contactInfoFound' class='badge badge-success'>&lt;- <small>has contact info</small><!-- &#x1F60A;--></div>");
-                 } //let's only post it once.
-                 //jNode.children("a").addClass("badge").addClass("badge-success").html(jNode.children("a").html().append("Contact info found!"));
+                 function addGoog(jNode){
+                     errorLog("ABC");
+                     errorLog(jNode);
+                     if (!jNode.hasClass("gAdded")) { /* console.log(jNode); */
+                         var googThisPage = (document.location.href.match('www.dextools.io/app/uniswap/pair-explorer'))?"pair":"pool";
+                         //console.log("gAdded?", jNode.hasClass("gAdded"));
+                         //console.log(googThisPage+" node ",jNode);
+                         var theAbbreviation=thisPageOptions().theAbbreviation(jNode);
+                         var theContract=thisPageOptions().theContract(jNode);
+                         var thePair=thisPageOptions().thePair(jNode);
+                         errorLog("HERE WE GO "+ theAbbreviation+" "+theContract+" "+thePair);
+                         // console.log("contract 1",theContract);
+                         var theIcon='';
+                         try {
+                             theIcon='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/'+Web3.utils.toChecksumAddress(theContract)+'/logo.png';} catch(e) {theContract="";}
 
-
-
-             }
-
-
-
-             function togglePreview (jNode) {$("#AP_DAJS_preview").toggle();}
-
-             function addLogo (jNode)
-             {jNode.addClass("gearImg").css({"background-repeat":"no-repeat","background-position":"center"})};
-
-             function rugPull(jNode) { if (jNode.text()=="-100%") { //var rugHTML='<span class="AP_DAJS_element text-warning badge-danger">RUGPULL</span> ';
-                 jNode.addClass("badge-dark");
-                 jNode.closest("td,datatable-body-cell").prevAll().eq(4).children(":first").children(":first").addClass("badge-dark");
-                 jNode.closest("td,datatable-body-cell").prevAll().eq(4).children(":first").children(":first").text("RUGPULL");
-             } }
-
-             function addLink(jNode) { var creditHTML='<div style="float:right;font-size:1.25em;" class="AP_DAJS_element"><div class="AP_DAJS_element sirImg backImg"></div> <a href="#" class="AP_DAJS_element">DYORassistant Installed</a></div>';
-                                      jNode.parent().prepend(creditHTML);
-                                     }
-             function addDisclaimer(jNode) { var creditHTML='<div style="margin:auto 0 auto auto;" class="AP_DAJS_element text-muted bottomdiv">'
-             +'<a id="creditlink" data-toggle="popover" data-container="body" '
-             +'data-boundary="viewport" data-placement="top" type="button" data-html="true" href=""'
-             +'class="AP_DAJS_element">DYORassistant</a><div class="AP_DAJS_element sirImg backImg" '
-             +'onclick="javascript:this.classList.toggle(\'anim\');"></div> <a id="historylink" '
-             +'data-toggle="popover" data-container="body" data-boundary="viewport" data-placement="top"'
-             +'type="button" data-html="true" class="AP_DAJS_element" href="javascript:AP_DAJS_displayHistory()">'
-             +currentVersion+'</a> installed <span id="newVersion" class="AP_DAJS_element"></span>'
-             +'</div><div id="creditPopover" class="popover"></div>';
-                                            jNode.before(creditHTML);
-                                            $("div.navbar-toggler").on('click', 'div.navbar-toggler', function (e) {
-
-                                            });
-
-                                            /******** show credits ******/
-                                            var showCreditsFunction=function() { var _this = this;
-                                                                                $("a#creditlink,a#upgradelink,a#historylink").not(this).popover('hide');
-                                                                                $(this).popover("show");//$('#frame'+thisCounter).src='https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22';
-                                                                                $(".popover")
-                                                                                    .on("mouseleave", function() {
-                                                                                    $(_this).popover('hide');
-                                                                                });
-                                                                               }
-                                            $("a#creditlink").popover({ trigger: "manual",
-                                                                       html: true,
-                                                                       animation: false,
-                                                                       sanitize:false,
-                                                                       content: function() { return '<span style="font-size:1.25em">by <a href="https://twitter.com/ApopheniaPays" target="_blank">@ApopheniaPays</a>.<p><a href="https://github.com/ApopheniaPays/dyorassistant" target="_blank">Github repo</a> - <a href="mailto:DYORfeedback@apopheniapays.com">email</a> - <a href="https://t.me/apopheniaprojects" target="_blank">Telegram Announcements</a></span>';} /* prevent duplicate elements */
-                                                                      })
-                                                .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
-                                                .on("click",showCreditsFunction ).on("mouseleave", function() {
-                                                var _this = this;
-                                                setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
-                                                                                                         }
-                                                                      }, 300);
-                                            });
-                                            /******** end credits *******/
-                                            $("a#historylink").popover({ trigger: "manual",
-                                                                        html: true,
-                                                                        animation: false,
-                                                                        sanitize:false,
-                                                                        content: function() { return "<textarea style='width:400px !important;height=600px !important;font-size=1.5em !important;' rows=25>"+decodeURIComponent(thisHistory).replace(/\n\n/g,"[BREAKHERE]").replace(/\n/g," ").replace(/  /g," ").replace(/\[BREAKHERE\]/g,"\n\n")+"</textarea>";} /* prevent duplicate elements */
-                                                                       })
-                                                .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
-                                                .on("click",showCreditsFunction ).on("mouseleave", function() {
-                                                var _this = this;
-                                                setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
-                                                                                                         }
-                                                                      }, 300);
-                                            });
-                                            /******** end historylink *******/
-                                           }
-             function makeRed(jNode){ var theTR=jNode.closest("TR,datatable-body-row");
-                                     theTR.addClass("redBkgd");
-                                     theTR.children("TD,datatable-body-cell").addClass("redBkgd");
-                                     theTR.children("TD,datatable-body-cell").removeClass("greenBkgd");
-                                     theTR.removeClass("greenBkgd");
-                                    }
-
-             function makeGreen(jNode){ var theTR=jNode.closest("TR,datatable-body-row");
-                                     theTR.addClass("greenBkgd");
-                                     theTR.children("TD,datatable-body-cell").addClass("greenBkgd");
-                                     theTR.children("TD,datatable-body-cell").removeClass("redBkgd");
-                                     theTR.removeClass("redBkgd");
-                                    }
-
-
-             function addGoog(jNode){
-                 if (!jNode.hasClass("gAdded")) { /* console.log(jNode); */
-                     var googThisPage = (document.location.href.match('www.dextools.io/app/uniswap/pair-explorer'))?"pair":"pool";
-                     //console.log("gAdded?", jNode.hasClass("gAdded"));
-                     //console.log(googThisPage+" node ",jNode);
-                     var theAbbreviation=(googThisPage=="pool")?jNode.closest("TD,datatable-body-cell").siblings().first().children(0).children(0).text():jNode.prev().find("strong").text().split(" ")[4];
-                     var theContract=(googThisPage=="pool")?jNode.closest("TD,datatable-body-cell").siblings().first().children(0).children(0).attr('href'):jNode.prev().children("a:first-of-type").attr('href');
-                     var thePair=(googThisPage=="pool")?jNode.closest("TD,datatable-body-cell").next().children(0).children(0).attr('href'):document.location.href;
-                    // console.log("contract 1",theContract);
-                     var theIcon='';
-                     try {theContract=theContract.substring(theContract.lastIndexOf("/")+1);
-                          theIcon='https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/'+Web3.utils.toChecksumAddress(theContract)+'/logo.png';} catch(e) {theContract="";}
-                     thePair=thePair.substring(thePair.lastIndexOf("/")+1);
-                     /* console.log("ABC", jNode.html()); */
-                    // console.log("contract 2",theContract);
+                         /* console.log("ABC", jNode.html()); */
+                         // console.log("contract 2",theContract);
 
 
 
-                     var thisCounter = IDcounter.toString();
-                     //let's create the row coin icon while we're here
-                     //try{
+                         var thisCounter = IDcounter.toString();
+                         //let's create the row coin icon while we're here
+                         //try{
                          jNode.closest("td,datatable-body-cell").siblings("td:first-child,datatable-body-cell:first-child").children(0).prepend('<img id="AP_DAJS_theCoinRow'+thisCounter+'" class="AP_DAJS_element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP_DAJS_theCoinRow'+thisCounter+'\').classList.add(\'pHide\')"> ');
-                     var poolFirstCell=jNode.closest("body[ap_dajs_pagetype=pool] datatable-body-cell").siblings("datatable-body-cell:first-child").children(0);
-                     // poolFirstCell.attr("style","width: 80px; max-width: 130px; height: 35px;");
-                     jNode.closest("td,datatable-body-cell").attr("style","width: 160px; max-width: 160px; height: 35px;");
-                     //} catch(e) {}
+                         var poolFirstCell=jNode.closest("body[ap_dajs_pagetype=pool] datatable-body-cell").siblings("datatable-body-cell:first-child").children(0);
+                         // poolFirstCell.attr("style","width: 80px; max-width: 130px; height: 35px;");
+                         jNode.closest("td,datatable-body-cell").attr("style","width: 160px; max-width: 160px; height: 35px;");
+                         //} catch(e) {}
 
-                     var theTD = jNode.closest("TD")||{};
-                     var theNextTD = theTD.next()||{};
-                     function displayPreviewOpener(thisCounter,url,section){
-                         var theResult = '<div style="float:right" id="AP_DAJS_floater'+section+thisCounter+'" class="AP_DAJS_element">'
-                         +' <a class="AP_DAJS_element floaterlink" id="AP_DAJS_floaterlink'+section+thisCounter+'" onmouseenter="AP_DAJS_previewToggle(\''+thisCounter+'\',\''+encodeURIComponent(url)+'\',\''+section+'\')">'
-                         +'&gt;&#x1F50E;</a></div>';
-                         return theResult;
-                     }
+                         var theTD = jNode.closest("TD")||{};
+                         var theNextTD = theTD.next()||{};
+                         function displayPreviewOpener(thisCounter,url,section){
+                             var theResult = '<div style="float:right" id="AP_DAJS_floater'+section+thisCounter+'" class="AP_DAJS_element">'
+                             +' <a class="AP_DAJS_element floaterlink" id="AP_DAJS_floaterlink'+section+thisCounter+'" onmouseenter="AP_DAJS_previewToggle(\''+thisCounter+'\',\''+encodeURIComponent(url)+'\',\''+section+'\')">'
+                             +'&gt;&#x1F50E;</a></div>';
+                             return theResult;
+                         }
 
-                     var thePreviewResults= '<div id="AP_DAJS_previewResults'+thisCounter+'" style="padding: 12px 0 0 12px;margin:0; float: right; top:0;background: white; width: 285px !important; height: 275px !important; display: block;word-break:break-word;word-wrap:break-word;" class="AP_DAJS_element"><span class="AP_DAJS_element"><b>Quick search for contract addresses:</b></span><br><iframe style="background:white;border-style:none;position:relative;top:0px;width:285px !important;height:95% !important;" id="AP_DAJS_results'+thisCounter+'" class="AP_DAJS_element"></iframe><br><span class="font-weight-normal">(Warning:<wbr> excessive<wbr> posts<wbr> only<wbr> on<wbr> social<wbr> media<wbr> sites<wbr> like<wbr> /biz/<wbr> or<wbr> Reddit <wbr>could<wbr> be <wbr>a coordinated <wbr>Pump & Dump. <wbr>Official <wbr>and <wbr>non-anonymous <wbr>sources <wbr>are <wbr>best.)</span></div>';
-
-
-                     var theHTML=
-                         //~popover button
-                         '<div class="AP_DAJS_element '+(theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted,i.text-secondary")[0]?'sirImg':'sirImg') //was 'sirImg':'gearImg'
-                     +' text-'+(theNextTD.children("i.text-info")[0]?'info':theNextTD.children("i.text-warning")[0]?'warning':
-                                theNextTD.children("i.text-danger")[0]?'danger':theNextTD.children("i.text-success")[0]?'success':'muted')
-                     +' backImg" id="popButton'+thisCounter+'" data-toggle="popover"'
-                     + ' data-container="body" data-boundary="viewport" data-placement="top" type="button" data-html="true">'
-                     + (theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted")[0]?'':theNextTD.children("i.text-danger,i.fa-warning.text-danger")[0]?'<span class="AP_DAJS_element">&#x1f4a9;</span>':theNextTD.children("i")[0]?'N':'')
-                     + '</div>'
+                         var thePreviewResults= '<div id="AP_DAJS_previewResults'+thisCounter+'" style="padding: 12px 0 0 12px;margin:0; float: right; top:0;background: white; width: 285px !important; height: 275px !important; display: block;word-break:break-word;word-wrap:break-word;" class="AP_DAJS_element"><span class="AP_DAJS_element"><b>Quick search for contract addresses:</b></span><br><iframe style="background:white;border-style:none;position:relative;top:0px;width:285px !important;height:95% !important;" id="AP_DAJS_results'+thisCounter+'" class="AP_DAJS_element"></iframe><br><span class="font-weight-normal">(Warning:<wbr> excessive<wbr> posts<wbr> only<wbr> on<wbr> social<wbr> media<wbr> sites<wbr> like<wbr> /biz/<wbr> or<wbr> Reddit <wbr>could<wbr> be <wbr>a coordinated <wbr>Pump & Dump. <wbr>Official <wbr>and <wbr>non-anonymous <wbr>sources <wbr>are <wbr>best.)</span></div>';
 
 
-                     + '<div id="popover-content'+thisCounter+'" class="AP_DAJS_element pHide"></div>'
-                     var contractFloatOpener=displayPreviewOpener(thisCounter,"https://apopheniapays.com/cryptosearch/resultsOnly.html?q=%22"+theContract+"%22+OR+%22"+thePair+"%22",'contract');
-                     var chartexFloatOpener=displayPreviewOpener(thisCounter,"https://chartex.pro/?symbol=UNISWAP:"+theAbbreviation,'chartex');
-                     var thisHTML= '<table class="AP_DAJS_element"><tr style="vertical-align:top"><td><div class="AP_DAJS_element centered AP_DAJS_popupItem">'
-
-                     //~initialize side popup
-                     + '<script id="AP_DAJS_hidePreviewResults">'
-                     +'document.getElementById("AP_DAJS_previewResults'+thisCounter+'").style.display="none";'
-                     +'</script>'
-
-                     //~popover headers
-                     + '<img id="AP_DAJS_theCoin'+thisCounter+'" class="AP_DAJS_element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP_DAJS_theCoin'+thisCounter+'\').classList.add(\'coinImg\');document.getElementById(\'AP_DAJS_warning'+thisCounter+'\').classList.remove(\'pHide\')"><span contentediable="true"  class="AP_DAJS_element abbrev" id="abbrev'+thisCounter+'">'+theAbbreviation+'</span> <div id="AP_DAJS_warning'+thisCounter+'" class="AP_DAJS_element badge badge-danger pHide">no icon!</div>'
-                     + '<br />'
-                     + contractFloatOpener
-
-                     //~Uniswap etherscan addr
-                     + '<a class="AP_DAJS_element AP_DAJS_popupWin"  href="https://etherscan.io/token/'+theContract+'"><div class="AP_DAJS_element smallImg addrImg hide"></div></a><span contentediable="true" class="AP_DAJS_element contract text-muted">'+ theContract.substring(0,14)+'...'+theContract.substring(theContract.length-14,theContract.length)
-                     + '</span>'
-
-                     //~Uniswap pool addr
-                     + '<br />'
-                     + '<a  class="AP_DAJS_element AP_DAJS_popupWin" href="https://uniswap.info/pair/'+thePair+'"><div class="AP_DAJS_element smallImg unisImg hide"></div></a> <span contentediable="true" class="AP_DAJS_element contract text-muted">'+ thePair.substring(0,14)+'...'+thePair.substring(thePair.length-14,thePair.length)
-                     + '</span>'
-                     + '</div>'
-
-                     //CryptoCompare Price
-                     + '<hr class="AP_DAJS_element"><span class="AP_DAJS_element">Cryptocompare price:</span> <span id="priceSpanUSD'+thisCounter+'" class="AP_DAJS_element"></span> <span onclick="javascript:alert(\'CryptoCompare\\\'s free API is not reliable and returns incorrect data. Sorry, I\\\'ll reenable this when I can find a reliable free data source. Love, your developer\')" class="AP_DAJS_element"><u>disabled</u></span>'
-                     + '<!-- script>AP_DAJS_getCCPrice("'+theAbbreviation+'","USD'+thisCounter+'");AP_DAJS_getCCPrice("'+theAbbreviation+'","ETH'+thisCounter+'")</script -->'
-                     + '<hr class="AP_DAJS_element">'
-
-                     //~Google Custom Seach Enging - crypto web search, include crypto news & social media, exclude block explorers
-                     + '<div class="AP_DAJS_element backImg googImg hide"></div>'
-                     + '<a onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin makeBold"'
-                     + ' href="https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22&orig='+theAbbreviation+'&icon='+encodeURIComponent(theIcon)+'">'
-                     +' Ox Addresses</a> | <a  '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://apopheniapays.com/cryptosearch/results.html?q=%22$'+theAbbreviation+'%22&orig=Token%20addr%20'+theContract+'%20and%20Uniswap%20liquidity%20pool%20address'+thePair+'&icon='+encodeURIComponent(theIcon)+'">&quot;$'+theAbbreviation+'&quot;</a> <br> Crypto Filtered Web Search'
-                     +'<hr class="AP_DAJS_element"> '
-
-                     //~whole web search
-                     + '<div class="AP_DAJS_element backImg googImg hide"></div> <a '
-                     +'  onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin makeBold"'
-                     +' href="https://www.google.com/search?q=%22'+theContract+'%22+OR+%22'+thePair+'%22">'
-                     +' Ox Addresses</a> | <a '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://www.google.com/search?q=%22$'+theAbbreviation+'%22">&quot;$'+theAbbreviation+'&quot;</a> <br> Whole Web Search'
-                     +'<hr class="AP_DAJS_element"> '
-
-                     //~zerion
-                     +'<a '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://app.zerion.io/explore/asset/'+theAbbreviation+'-'+theContract+'">'
-                     +' <div class="AP_DAJS_element backImg zeriImg hide"></div>Token/Portfolio Analytics</a> <br>Zerion'
-                     +'<hr class="AP_DAJS_element">'
-
-                     //~Uniswap
-                     +'<div class="AP_DAJS_element backImg unisImg hide"></div> <a  '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://uniswap.info/token/'+theContract+'">Token Analytics</a> | '
-                     +' <a  '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://uniswap.info/pair/'+thePair+'">Pool Stats</a> <br>Uniswap'
-                     +'<hr class="AP_DAJS_element">'
-
-                     //~astrotools.io
-                     +'<div class="AP_DAJS_element backImg astrImg hide"></div> '
-                     +' <a  '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://app.astrotools.io/pair-explorer/'+thePair+'">Trading/Analytics</a> <br>Astrotools'
-                     +'<hr class="AP_DAJS_element">'
-
-                     //~Mooniswap
-                     +'<div class="AP_DAJS_element backImg moonImg hide"></div> <a  '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://mooniswap.info/token/'+theContract+'">Token Analytics</a> | '
-                     +' <a  '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://mooniswap.exchange/#/swap?inputCurrency='+theContract+'">Live trading</a> <br>1inch Mooniswap'
-                     +'<hr class="AP_DAJS_element">'
-
-                     //~unicrypt
-                     +'<a  '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://unicrypt.network/uniswap-browser/pair/'+thePair+'">'
-                     +' <div class="AP_DAJS_element backImg crypImg hide"></div>Verify liquidity lock</a> <br>Unicrypt'
-                     +'<hr class="AP_DAJS_element"> '
-
-                     //~cerberus.saren
-                     +'<a '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://cerberus.saren.io/coins/'+theContract+'">'
-                     +' <div class="AP_DAJS_element backImg cerbImg hide"></div> Token analytics</a> <br> cerberus.saren'
-                     +'<hr class="AP_DAJS_element"> '
-
-                     //~Chartex
-                     /*  + chartexFloatOpener No, don't the popover is really too small for Chartex */
-                     +'<a '
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://chartex.pro/?symbol=UNISWAP:'+theAbbreviation+'">'
-                     +' <div class="AP_DAJS_element backImg chexImg hide"></div> Candlestick chart</a> <br> ChartEX'
-                     +'<hr class="AP_DAJS_element">'
-
-                     //~Uniswap.vision
-                     +'<a'
-                     +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
-                     +' href="https://uniswap.vision/?ticker=UniswapV2:'+theAbbreviation+'ETH">'
-                     +' <div class="AP_DAJS_element backImg visiImg hide"></div> Candlestick chart</a> <br> uniswap.vision'
-                     +'</td><td>'+thePreviewResults
-                     +'</td></tr></table>' //end links
+                         var theHTML=
+                             //~popover button
+                             '<div class="AP_DAJS_element '+(theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted,i.text-secondary")[0]?'sirImg':'sirImg') //was 'sirImg':'gearImg'
+                         +' text-'+(theNextTD.children("i.text-info")[0]?'info':theNextTD.children("i.text-warning")[0]?'warning':
+                                    theNextTD.children("i.text-danger")[0]?'danger':theNextTD.children("i.text-success")[0]?'success':'muted')
+                         +' backImg" id="popButton'+thisCounter+'" data-toggle="popover"'
+                         + ' data-container="body" data-boundary="viewport" data-placement="top" type="button" data-html="true">'
+                         + (theNextTD.children("i.text-success,i.text-info,i.text-warning,i.text-muted")[0]?'':theNextTD.children("i.text-danger,i.fa-warning.text-danger")[0]?'<span class="AP_DAJS_element">&#x1f4a9;</span>':theNextTD.children("i")[0]?'N':'')
+                         + '</div>'
 
 
+                         + '<div id="popover-content'+thisCounter+'" class="AP_DAJS_element pHide"></div>'
+                         var contractFloatOpener=displayPreviewOpener(thisCounter,"https://apopheniapays.com/cryptosearch/resultsOnly.html?q=%22"+theContract+"%22+OR+%22"+thePair+"%22",'contract');
+                         var chartexFloatOpener=displayPreviewOpener(thisCounter,"https://chartex.pro/?symbol=UNISWAP:"+theAbbreviation,'chartex');
+                         var thisHTML= '<table class="AP_DAJS_element"><tr style="vertical-align:top"><td><div class="AP_DAJS_element centered AP_DAJS_popupItem">'
 
-                     +''; // just leave this at bottom so I don't have to keep moving semicolon as I add things
+                         //~initialize side popup
+                         + '<script id="AP_DAJS_hidePreviewResults">'
+                         +'document.getElementById("AP_DAJS_previewResults'+thisCounter+'").style.display="none";'
+                         +'</script>'
 
-                     //                 var theHTML = '<Div href="#" data-toggle="popover" title="Popover Header" data-html="true" data-content="'+theInnerHTML.replace(/"/g,'\\"')+'" class="AP_DAJS_element">Toggle popover</div>';
-                     //gotta use a DIV anot an IMG, because IMG with SRC="" or missing SRC attribute causes visual glitches, unwanted borders, etc
-                     if(googThisPage=="pool") {jNode.parent().parent().append( theHTML);jNode.addClass("gAdded");} else {jNode.append( theHTML);jNode.addClass("gAdded");}
-                     var showFunction=function() { var _this = this;
-                                                  $("div.sirImg").not(this).popover('hide');
-                                                  $(this).popover("show");//$('#frame'+thisCounter).src='https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22';
-                                                  $(".popover")
-                                                      .on("mouseleave", function() {
-                                                      $(_this).popover('hide');
-                                                  });
-                                                 }
-                     $("div#popButton"+thisCounter).popover({ trigger: "manual",
-                                                             html: true,
-                                                             animation: false,
-                                                             sanitize:false,
-                                                             content: function() { return thisHTML;} /* prevent duplicate elements */
-                                                            })
-                         .on("mouseenter",ShowAssistantOnHover?showFunction:"" )
-                         .on("click",showFunction ).on("mouseleave", function() {
-                         var _this = this;
-                         setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
-                                                                                  }
-                                               }, 300);
-                     });
+                         //~popover headers
+                         + '<img id="AP_DAJS_theCoin'+thisCounter+'" class="AP_DAJS_element smallImg hide" src="'+theIcon+'" onerror="document.getElementById(\'AP_DAJS_theCoin'+thisCounter+'\').classList.add(\'coinImg\');document.getElementById(\'AP_DAJS_warning'+thisCounter+'\').classList.remove(\'pHide\')"><span contentediable="true"  class="AP_DAJS_element abbrev" id="abbrev'+thisCounter+'">'+theAbbreviation+'</span> <div id="AP_DAJS_warning'+thisCounter+'" class="AP_DAJS_element badge badge-danger pHide">no icon!</div>'
+                         + '<br />'
+                         + contractFloatOpener
+
+                         //~Uniswap etherscan addr
+                         + '<a class="AP_DAJS_element AP_DAJS_popupWin"  href="https://etherscan.io/token/'+theContract+'"><div class="AP_DAJS_element smallImg addrImg hide"></div></a><span contentediable="true" class="AP_DAJS_element contract text-muted">'+ theContract.substring(0,11)+'...'+theContract.substring(theContract.length-11,theContract.length)
+                         + '</span>'
+
+                         //~Uniswap pool addr
+                         + '<br />'
+                         + '<a  class="AP_DAJS_element AP_DAJS_popupWin" href="https://uniswap.info/pair/'+thePair+'"><div class="AP_DAJS_element smallImg unisImg hide"></div></a><span contentediable="true" class="AP_DAJS_element contract text-muted">'+ thePair.substring(0,11)+'...'+thePair.substring(thePair.length-11,thePair.length)
+                         + '</span>'
+                         + '</div>'
+
+                         //CryptoCompare Price
+                         + '<hr class="AP_DAJS_element"><span class="AP_DAJS_element">Cryptocompare price:</span> <span id="priceSpanUSD'+thisCounter+'" class="AP_DAJS_element"></span> <span onclick="javascript:alert(\'CryptoCompare\\\'s free API is not reliable and returns incorrect data. Sorry, I\\\'ll reenable this when I can find a reliable free data source. Love, your developer\')" class="AP_DAJS_element"><u>disabled</u></span>'
+                         + '<!-- script>AP_DAJS_getCCPrice("'+theAbbreviation+'","USD'+thisCounter+'");AP_DAJS_getCCPrice("'+theAbbreviation+'","ETH'+thisCounter+'")</script -->'
+                         + '<hr class="AP_DAJS_element">'
+
+                         //~Google Custom Seach Enging - crypto web search, include crypto news & social media, exclude block explorers
+                         + '<div class="AP_DAJS_element backImg googImg hide"></div>'
+                         + '<a onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin makeBold"'
+                         + ' href="https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22&orig='+theAbbreviation+'&icon='+encodeURIComponent(theIcon)+'">'
+                         +' Ox Addresses</a> | <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://apopheniapays.com/cryptosearch/results.html?q=%22$'+theAbbreviation+'%22&orig=Token%20addr%20'+theContract+'%20and%20Uniswap%20liquidity%20pool%20address'+thePair+'&icon='+encodeURIComponent(theIcon)+'">&quot;$'+theAbbreviation+'&quot;</a> <br> Crypto Filtered Web Search'
+                         +'<hr class="AP_DAJS_element"> '
+
+                         //~whole web search
+                         + '<div class="AP_DAJS_element backImg googImg hide"></div> <a '
+                         +'  onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin makeBold"'
+                         +' href="https://www.google.com/search?q=%22'+theContract+'%22+OR+%22'+thePair+'%22">'
+                         +' Ox Addresses</a> | <a '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://www.google.com/search?q=%22$'+theAbbreviation+'%22">&quot;$'+theAbbreviation+'&quot;</a> <br> Whole Web Search'
+                         +'<hr class="AP_DAJS_element"> '
+
+                         //~zerion
+                         +'<a '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://app.zerion.io/explore/asset/'+theAbbreviation+'-'+theContract+'">'
+                         +' <div class="AP_DAJS_element backImg zeriImg hide"></div>Token/Portfolio Analytics</a> <br>Zerion'
+                         +'<hr class="AP_DAJS_element">'
+
+                         //~Uniswap
+                         +'<div class="AP_DAJS_element backImg unisImg hide"></div> <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://uniswap.info/token/'+theContract+'">Token Analytics</a> | '
+                         +' <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://uniswap.info/pair/'+thePair+'">Pool Stats</a> <br>Uniswap'
+                         +'<hr class="AP_DAJS_element">'
+
+                        //~Ethplorer
+                         +'<div class="AP_DAJS_element backImg ethpImg hide"></div> <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://ethplorer.io/address/'+theContract+'">Token</a> | '
+                         +' <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://ethplorer.io/address/'+thePair+'">Pair</a> <br>Ethplorer.io'
+                         +'<hr class="AP_DAJS_element">'
+
+                         //~astrotools.io
+                         +'<div class="AP_DAJS_element backImg astrImg hide"></div> '
+                         +' <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://app.astrotools.io/pair-explorer/'+thePair+'">Trading/Analytics</a> <br>Astrotools'
+                         +'<hr class="AP_DAJS_element">'
+
+                         //~Mooniswap
+                         +'<div class="AP_DAJS_element backImg moonImg hide"></div> <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://mooniswap.info/token/'+theContract+'">Token Analytics</a> | '
+                         +' <a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://mooniswap.exchange/#/swap?inputCurrency='+theContract+'">Live trading</a> <br>1inch Mooniswap'
+                         +'<hr class="AP_DAJS_element">'
+
+                         //~unicrypt
+                         +'<a  '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://unicrypt.network/uniswap-browser/pair/'+thePair+'">'
+                         +' <div class="AP_DAJS_element backImg crypImg hide"></div>Verify liquidity lock</a> <br>Unicrypt'
+                         +'<hr class="AP_DAJS_element"> '
+
+                         //~cerberus.saren
+                         +'<a '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://cerberus.saren.io/coins/'+theContract+'">'
+                         +' <div class="AP_DAJS_element backImg cerbImg hide"></div> Token analytics</a> <br> cerberus.saren'
+                         +'<hr class="AP_DAJS_element"> '
+
+                         //~Chartex
+                         /*  + chartexFloatOpener No, don't the popover is really too small for Chartex */
+                         +'<a '
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://chartex.pro/?symbol=UNISWAP:'+theAbbreviation+'">'
+                         +' <div class="AP_DAJS_element backImg chexImg hide"></div> Candlestick chart</a> <br> ChartEX'
+                         +'<hr class="AP_DAJS_element">'
+
+                         //~Uniswap.vision
+                         +'<a'
+                         +'   onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         +' href="https://uniswap.vision/?ticker=UniswapV2:'+theAbbreviation+'ETH">'
+                         +' <div class="AP_DAJS_element backImg visiImg hide"></div> Candlestick chart</a> <br> uniswap.vision'
+                         +'</td><td>'+thePreviewResults
+                         +'</td></tr></table>' //end links
 
 
 
+                         +''; // just leave this at bottom so I don't have to keep moving semicolon as I add things
+
+                         //                 var theHTML = '<Div href="#" data-toggle="popover" title="Popover Header" data-html="true" data-content="'+theInnerHTML.replace(/"/g,'\\"')+'" class="AP_DAJS_element">Toggle popover</div>';
+                         //gotta use a DIV anot an IMG, because IMG with SRC="" or missing SRC attribute causes visual glitches, unwanted borders, etc
+                         thisPageOptions().researchAsstPlacement(jNode).append( theHTML);jNode.addClass("gAdded");
+                         var showFunction=function() { var _this = this;
+                                                      $("div.sirImg").not(this).popover('hide');
+                                                      $(this).popover("show");//$('#frame'+thisCounter).src='https://apopheniapays.com/cryptosearch/results.html?q=%22'+theContract+'%22+OR+%22'+thePair+'%22';
+                                                      $(".popover")
+                                                          .on("mouseleave", function() {
+                                                          $(_this).popover('hide');
+                                                      });
+                                                     }
+                         $("div#popButton"+thisCounter).popover({ trigger: "manual",
+                                                                 html: true,
+                                                                 animation: false,
+                                                                 sanitize:false,
+                                                                 content: function() { return thisHTML;} /* prevent duplicate elements */
+                                                                })
+                             .on("mouseenter",ShowAssistantOnHover?showFunction:"" )
+                             .on("click",showFunction ).on("mouseleave", function() {
+                             var _this = this;
+                             setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
+                                                                                      }
+                                                   }, 300);
+                         });
 
 
 
-                     /* didn't work, forget it     (function(){ new Clipboard('#copy-buttonContract'+thisCounter);
+
+
+
+                         /* didn't work, forget it     (function(){ new Clipboard('#copy-buttonContract'+thisCounter);
                      new Clipboard('#copy-buttonAbbrev'+thisCounter);
  })(); */
 
-                     //.popover({ html: true,trigger : 'hover',	content: function() { return $('#popover-content'+thisCounter).html(); }});
-                     IDcounter++;if(theContract!=""){}
-                     return true;}
-             }
-
-             function poolWarning(jNode) { var theClasses= jNode.prop("class");
-
-                                          var theClass = (theClasses.match(/\btext\-[^ ]*\b/g, '')||[""])[0];
-                                          var thePoolLeft = jNode.closest("datatable-body-cell").siblings().last().prev()
-                                          thePoolLeft.addClass(theClass).addClass("makeBold");
-                                          thePoolLeft.prev().prev().addClass(theClass).addClass("makeBold");
-
-                                         }
-
-             //add Styles
-             //Check if fontawesome is installed, add if not
-             $(document).ready(
-
-                 function () {
-                     let span = document.createElement('span');
-
-                     span.className = 'fa';
-                     span.style.display = 'none';
-                     document.body.insertBefore(span, document.body.firstChild);
-
-                     function css(element, property) {
-                         return window.getComputedStyle(element, null).getPropertyValue(property);
-                     }
-
-                     if (css(span, 'font-family') !== 'FontAwesome') {
-                         let headHTML = document.head;
-                         $(headHTML).append('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">');
-                         s
-                     }
-                     document.body.removeChild(span);
+                         //.popover({ html: true,trigger : 'hover',	content: function() { return $('#popover-content'+thisCounter).html(); }});
+                         IDcounter++;if(theContract!=""){}
+                         return true;}
                  }
 
-             );
+                 function poolWarning(jNode) { var theClasses= jNode.prop("class");
 
-             GM_addStyle ( `
+                                              var theClass = (theClasses.match(/\btext\-[^ ]*\b/g, '')||[""])[0];
+                                              var thePoolLeft = jNode.closest("datatable-body-cell").siblings().last().prev()
+                                              thePoolLeft.addClass(theClass).addClass("makeBold");
+                                              thePoolLeft.prev().prev().addClass(theClass).addClass("makeBold");
+
+                                             }
+
+                 //add Styles
+
+                 $(document).ready(
+
+                     function () {//make sure page type is set
+                         pageSpecificElements();
+                            //Check if fontawesome is installed, add if not
+                         let span = document.createElement('span');
+
+                         span.className = 'fa';
+                         span.style.display = 'none';
+                         document.body.insertBefore(span, document.body.firstChild);
+
+                         function css(element, property) {
+                             return window.getComputedStyle(element, null).getPropertyValue(property);
+                         }
+
+                         if (css(span, 'font-family') !== 'FontAwesome') {
+                             let headHTML = document.head;
+                             $(headHTML).append('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">');
+                             s
+                         }
+                         document.body.removeChild(span);
+                     }
+
+                 );
+
+                 GM_addStyle ( `
 
 
 /*body {max-width: 100% ;max-height: 100% ; overflow: hidden} yes, need this to prevent scrollbars during animation, but, breaks pair explorer */
@@ -1095,7 +1273,7 @@ var filterState="";
 
 .invisible{ display:none; }
 
-
+body[AP_DAJS_pagetype=astropair] div.bottomdiv {position:absolute;bottom:5px;left:5px;}
 body[AP_DAJS_pagetype=pair] h3 > a > i, body[AP_DAJS_pagetype=astropair] #header > app-token-info > div > div.icons-list > a.coingecko.ng-star-inserted {background:#FFFF00 !important;}
 
 #header > app-token-info > div > div.icons-list > a > img
@@ -1160,7 +1338,7 @@ body[ap_dajs_pagetype="pool"] datatable-body-cell.text-success ~ datatable-body-
 -moz-border-radius: 24px;
 border-radius: 24px;}
 
-.popover {max-width: none !important; } /*otherwise can't make them wider*/ //550
+.popover {max-width: none !important; background:RGBA(255,255,255,1) !important;} /*otherwise can't make them wider*/ //550
 .popover-body * {font-weight:normal;}
 .popover-body .backImg {float:left;margin:2px 2px !important;}
 
@@ -1221,13 +1399,13 @@ content:'\\f0b0';
 
  }
 
-.popover-body a,.popover-body a:hover {line-height: 1.25em !important;color:#00b8d8;font-size: 12px}
+.popover-body a,.popover-body a:hover {line-height: 12px; !important;color:#00b8d8;font-size: 12px;z-index:99999;}
 .popover-body a:not(.makeBold) {font-weight:normal;}
 
 .popover{ box-shadow: 0 3px 15px rgba(90,97,105,.15), 0 2px 3px rgba(90,97,105,.25),0px 3px 6px 3px rgba(16,75,95,0.25) !important;
         -webkit-box-shadow: 0 3px 15px rgba(90,97,105,.15), 0 2px 3px rgba(90,97,105,.25),0px 3px 6px 3px rgba(16,75,95,0.25) !important;
         -moz-box-shadow: 0 3px 15px rgba(90,97,105,.15), 0 2px 3px rgba(90,97,105,.25),0px 3px 6px 3px rgba(16,75,95,0.25) !important;
- }
+z-index:99999;font-size:12px !important;line-height:14px;}
 
 .sorting {text-decoration:underline;}
 
@@ -1325,6 +1503,8 @@ font-weight:bold;
 font-size:15px;
 padding: 0 2px 6px 0;}
 
+.ethpImg { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAbCAYAAACX6BTbAAADQElEQVRIDbVVSyh8cRgdzxmEjEZSRpSFopHMXoYVhUQWyoKFzaTYeDQWNhb2NAtjQ1EzFqwpSSmSspFHI4+FPEfehvPvfLmaO3PvHYu/X93mzr2/73zn933nfNeEP1ymP8TGr8Gfn59xfn6Oq6srhMPhX3GKC/719YXX11csLS2hu7sbg4OD2N3d/T/g7+/v2N/fR319PdLS0lBYWIj+/n6EQqG4CQyZf35+4vr6GuPj47BarTCZTEhJSUF1dTVWVlbA90bLEPzx8RGbm5soKSlBcnIyEhMT5crJyUFTUxNubm4ME+iCk9XBwQG6uroEmIyZhGVhkoKCAni9XpCA3tIFv7y8xOzsLGw2GxISEuBwODA9PQ2PxwMyt1gsqKysxM7ODt7e3jTxNcG5eW1tDTU1NcI6MzMTIyMjOD09lTK1tbXJ8/T0dLjdbpydnYGqil6a4EdHRxgeHkZWVpYopK6uDnt7e6ByWOeFhQUUFRXJiUpLSzE3N4eHh4do7FgTsYbz8/MoLy8XZRQXF0t5lNqyF0w+MDAAs9mM1NRUNDY2YmtrK8ZcKuYMpEGam5ulpqx3Z2enaDpSdnTr9vY2qqqqhEB+fr70gu6NXCpwshsdHUVeXp4EOZ1OqXEksBJ8f3+PqakpaS4bTu2zXJFLBX58fIza2lo5bnZ2NlpaWqTGWs0ie3qANac07XY7xsbGIrHVNX96esLk5KRspGkYSC1/fHyogvj/5OREPJCRkSF1Z9NXV1dV+1TMyfDw8BB9fX1idwayNOvr63h5efkJvLi4EBIcCUlJSaioqIDP54uZNypwRlNuGxsbaG1tlaZSjh0dHeJWvru7u8Py8rIActawP0NDQ+KBn+zfNzHgfM6J5/f7RY5kRkey0cFgUBK3t7dLw+lS3nNqas14TXAm4IeBasjNzRWzlJWVYWJiQhzJ0xCYXoguWSR7XXDKj4Orp6dHWFIRBOUo4GmojpmZGVAEeksXnAFsIm3PptKJ1DMvmqa3t1cmopZMlWSG4AzkzAgEAjJLyJjMGxoa5FRGwExgCM4NLI/yNWKNXS6XOFFvzCqsfwWubKb+FxcX5fN2e3urPDb8jcvcMDrOyz8F/wef3Sw2f5ic6QAAAABJRU5ErkJggg==)
+!important;}
 
 .gearImgOLDtriangle{ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAATCAYAAACUef2IAAAA+klEQVQ4Ea1UPQ7CIBTmDAYYjKPRA7kZB2dPYRy0j/QOzo48ooOJ8QSewiuoqwYsCYW2vEabNPC+P74ylDHiw5UBXpg5UU6XCcC3fekOglIoXPpgsdNjgoUmqULPPpzmyqgE4C28AruXgKuMLU/HLeM5n9CgaAtxuMJrg4UGVcGHWC0AX5aLcdLc1tabc7zX1Va+PU6skYOe1ohgEAXue7emtqHqXB8JpqQ2kYVeWO0ATqPgY5q3vVowxkh6AfigtvW1hqXh1iMVzjyWrN/T9T0hMkBn604yE2xp51eIidQSCdgDkKDXSYZv+6/V9Qku//Jj8NP/CSWYzQe4WOyxcf17xQAAAABJRU5ErkJggg==)
 !important;}
@@ -1472,12 +1652,13 @@ translateZ(0)
  }
 }
 ` );
-             /* note: translateZ(0) supposedly iproves css anim performance by forcing creation of a separate layer. */
+                 /* note: translateZ(0) supposedly iproves css anim performance by forcing creation of a separate layer. */
 
 
-             //old sirImg data:image/png;base64,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
-             initPage();
+                 //old sirImg data:image/png;base64,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
+                 initPage();
 
-             //All finished
+                 //All finished
 
-            })();
+                })();
+} catch (e) {console.log("e is ",e);}
