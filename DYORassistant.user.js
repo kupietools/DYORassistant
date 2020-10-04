@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DYORassistant
 // @namespace    https://apopheniapays.com/
-// @version      ALPHA-2020.10.03s
+// @version      ALPHA-2020.10.03s2
 // @description  Adds some research tools and visual niceties to popular DeFi utilities and sites. Does not interfere with existing functionality, just adds cosmetics for user convenience.
 // @author       @ApopheniaPays
 // @updateURL    https://github.com/ApopheniaPays/DYORassistant/raw/master/DYORassistant.user.js
@@ -12,6 +12,7 @@
 // @match        *://dapp.trendering.com/*
 // @match        *://unitradebeta.com/*
 // @match        *://chartex.pro/*
+// @match        *://twitter.com/*
 // @grant        GM_addStyle
 // @grant        GM.xmlHttpRequest
 // @connect      github.com
@@ -270,11 +271,14 @@ var scamWallets= {scammer:{wallet:"0x408f2ff726aae56ea7382b8676d8db43d624df7c",
 /**/
 /**/
 
-var currentVersion="ALPHA-2020.10.03s";
+var currentVersion="ALPHA-2020.10.03s2";
 var thisHistory= encodeURIComponent(`
 
 VERSION HISTORY
 ===============
+
+2020.10.03s2 - I promised that the earlier update tonight contained bugs, and I delivered! This fixes
+them. Also began adding DYORassistant niceties to Etherscan.io
 
 2020.10.03s - "Stealth update". Major improvements to integration with Astrotools, most features
 previously developed for DEXTools now work with Astrotools, although there still may be bugs.
@@ -341,7 +345,7 @@ try{
     (function() {'use strict';
 
                  //Hey ho, let's go
-                 var logErrors=true;
+                 var logErrors=false;
                  var thisPage="all";
                  var pageCodes = {pair:
                                   {url:"www.dextools.io/app/uniswap/pair-explorer",
@@ -379,7 +383,7 @@ try{
                                   {url:"app.astrotools.io/pair-explorer",
                                    features:["noZerion","noListFilter"],
                                    onlySortColumns:"TH:nth-child(7)",
-                                   addDisclaimerAnchor:"div.ant-layout-sider-children",
+                                   addDisclaimerAnchor:"li.ant-pagination-prev", /* "div.ant-layout-sider-children", */
 
                                    researchAsstAnchor:"div.symbol div.icons-list",
                                    researchAsstPlacement: function(jNode) {return jNode;},
@@ -390,7 +394,18 @@ try{
                                    { ".circle":addLogo}
 
 
+                                  },
+                                  etherscan:
+                                  {url:"etherscan.io",
+                                  addDisclaimerAnchor:"footer > div.container > div:last-child",
+                                   customWaitElements: {
+                                   "td a[href*='0x']:not(.AP_DAJS_ethPrepared):not(.AP_DAJS_element):not(:has(i.fas.fa-chart-line)), a[href*='0x'][id^='spanTarget']:not(.AP_DAJS_ethPrepared):not(.AP_DAJS_element)": prepareEtherscanLink /*any link in a TD or id starting with "spanTarget" with an address will get parsed on etherscan*/
+
+
+
                                   }
+                                  }
+
                                  };
 
 
@@ -694,7 +709,7 @@ jNode.addClass("AP_DAJS_ethPrepared");
                  errorLog("d");
                  errorLog(/0\x[0-9a-f]+/i.exec(thisHREF)[0]);
                  errorLog("e"); */
-                     var theHex= /0\x[0-9a-f]+/i.exec(thisHREF)[0];
+                     var theHex= /0\x[0-9a-f]+(?!.*0\x[0-9a-f]+)/i.exec(thisHREF)[0]; /* get last match with ?! negative lookahead */
                      /*                 errorLog("f");
                  errorLog(theHex); */
                      //   try {
@@ -721,16 +736,18 @@ jNode.addClass("AP_DAJS_ethPrepared");
 
 
                  function zerionLink (theHex) {
+                     var output="";
                      if (!pageHasFeature("noZerion")){
-                         return ('<a title="Zerion address overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_dependency AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         output=output+ ('<a title="Zerion address overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_dependency AP_DAJS_popupItem AP_DAJS_popupWin"'
                                  +' href="https://app.zerion.io/'+theHex+'/overview">'
                                  +' <div class="AP_DAJS_element backImgSmol zeriImg hide"></div></a>');
                      }
    if (!pageHasFeature("noEthplorer")){
-                         return ('<a title="Ethplorer address overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_popupItem AP_DAJS_popupWin"'
+                         output=output+ ('<a title="Ethplorer address overview" onclick="window.open(this.href, \'windowName\', \'width=1000, height=700, right=24, top=24, scrollbars, resizable\'); return false;" class="AP_DAJS_element AP_DAJS_dependentElement AP_DAJS_popupItem AP_DAJS_popupWin"'
                                  +' href="https://ethplorer.io/address/'+theHex+'">'
                                  +' <div class="AP_DAJS_element backImgSmol ethpImg hide"></div></a>');
                      }
+                     return output;
 
                  }
 
@@ -833,7 +850,7 @@ jNode.addClass("AP_DAJS_ethPrepared");
                          errorLog(prop);
 errorLog("URL "+document.location.href);
                          errorLog("PROP URL "+pageCodes[prop].url);
-                         if(document.location.href.match(pageCodes[prop].url)) {
+                         if(document.location.href.match('//'+pageCodes[prop].url)) {
                              thisPage=prop;errorLog("+++");}
 
                      }
@@ -945,14 +962,14 @@ var filterState="";
                                           jNode.parent().prepend(creditHTML);
                                          }
                  function addDisclaimer(jNode) { var creditHTML='<div style="margin:auto 0 auto auto;" class="AP_DAJS_element text-muted bottomdiv">'
-                 +'<a id="creditlink" data-toggle="popover" data-container="body" '
-                 +'data-boundary="viewport" data-placement="top" type="button" data-html="true" href=""'
-                 +'class="AP_DAJS_element">DYORassistant</a><div class="AP_DAJS_element sirImg backImg" '
+                 +'<a id="creditlink" data-toggle="popover" '
+                 +'data-boundary="body" data-container="body" data-placement="top" type="button" data-html="true" href=""'
+                 +'class="AP_DAJS_element">DYORassistant</a><div class="AP_DAJS_element sirImg backImg easterEgg" '
                  +'onclick="javascript:this.classList.toggle(\'anim\');"></div> <a id="historylink" '
-                 +'data-toggle="popover" data-container="body" data-boundary="viewport" data-placement="top"'
+                 +'data-toggle="body" data-container="body" data-boundary="body" data-placement="top"'
                  +'type="button" data-html="true" class="AP_DAJS_element" href="javascript:AP_DAJS_displayHistory()">'
                  +currentVersion+'</a> installed <span id="newVersion" class="AP_DAJS_element"></span>'
-                 +'</div><div id="creditPopover" class="popover"></div>';
+                 +'</div><!-- div id="creditPopover" class="popover"></div SEEMS LIKE WE DONT NEED THIS -->';
                                                 jNode.before(creditHTML);
                                                 $("div.navbar-toggler").on('click', 'div.navbar-toggler', function (e) {
 
@@ -970,30 +987,33 @@ var filterState="";
                                                 $("a#creditlink").popover({ trigger: "manual",
                                                                            html: true,
                                                                            animation: false,
+                                                                            fallbackPlacement : ['right'],
                                                                            sanitize:false,
-                                                                           content: function() { return '<span style="font-size:1.25em">by <a href="https://twitter.com/ApopheniaPays" target="_blank">@ApopheniaPays</a>.<p><a href="https://github.com/ApopheniaPays/dyorassistant" target="_blank">Github repo</a> - <a href="mailto:DYORfeedback@apopheniapays.com">email</a> - <a href="https://t.me/apopheniaprojects" target="_blank">Telegram Announcements</a></span>';} /* prevent duplicate elements */
+                                                                           content: function() { return '<span style="font-size:1em">Coded with the white-hot<br>intensity of a thousand<br>suns by <a href="https://twitter.com/ApopheniaPays" target="_blank">@ApopheniaPays</a>.<hr> &gt; <a href="https://github.com/ApopheniaPays/dyorassistant" target="_blank">Github repo</a><hr> &gt; <a href="mailto:DYORfeedback@apopheniapays.com">email</a><hr> &gt; <a href="https://t.me/apopheniaprojects" target="_blank">Telegram Announcements</a></span>';} /* prevent duplicate elements */
                                                                           })
                                                     .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
                                                     .on("click",showCreditsFunction ).on("mouseleave", function() {
                                                     var _this = this;
-                                                    setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hixde");
+                                                    setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
                                                                                                              }
-                                                                          }, 300);
+                                                                          }, 150);
                                                 });
                                                 /******** end credits *******/
+                                                /******** begin historylink *******/
                                                 $("a#historylink").popover({ trigger: "manual",
                                                                             html: true,
                                                                             animation: false,
+                                                                             fallbackPlacement : ['right'],
                                                                             sanitize:false,
-                                                                            content: function() { return "<textarea style='width:400px !important;height=600px !important;font-size=1.5em !important;' rows=25>"+decodeURIComponent(thisHistory).replace(/\n\n/g,"[BREAKHERE]").replace(/\n/g," ").replace(/  /g," ").replace(/\[BREAKHERE\]/g,"\n\n")+"</textarea>";} /* prevent duplicate elements */
+                                                                            content: function() { return "<div style='width:300px !important;height:400px;overflow-y:auto;font-size=1.5em !important;'>"+decodeURIComponent(thisHistory).replace(/\n\n/g,"[BREAKHERE]").replace(/\n/g," ").replace(/  /g," ").replace(/\[BREAKHERE\]/g,"<p>")+"</div>";} /* prevent duplicate elements */
                                                                            })
                                                     .on("mouseenter",ShowAssistantOnHover?showCreditsFunction:"" )
                                                     .on("click",showCreditsFunction ).on("mouseleave", function() {
                                                     var _this = this;
-                                                    setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hidxe");
+                                                    setTimeout(function() { if (!$(".popover:hover").length) { $(_this).popover("hide");
                                                                                                              }
-                                                                          }, 300);
-                                                });
+                                                                          }, 150);
+                                                }) ;
                                                 /******** end historylink *******/
                                                }
                  function makeRed(jNode){ var theTR=jNode.closest("TR,datatable-body-row");
@@ -1202,6 +1222,8 @@ var filterState="";
                                                                  html: true,
                                                                  animation: false,
                                                                  sanitize:false,
+
+
                                                                  content: function() { return thisHTML;} /* prevent duplicate elements */
                                                                 })
                              .on("mouseenter",ShowAssistantOnHover?showFunction:"" )
@@ -1211,6 +1233,7 @@ var filterState="";
                                                                                       }
                                                    }, 300);
                          });
+                          $("div#popButton"+thisCounter).data("bs.popover").getTipElement().addClass("AP_DAJS_popover");
 
 
 
@@ -1271,9 +1294,12 @@ var filterState="";
                  #AP_DAJS_closebutton {height:24px;widht:24px;position:fixed;top:5px;right:5px;border:1px solid black;content:'X';color:red;background-color:white;font-size:24px;font-weight:bold;}
 #AP_DAJS_popupframe {height:100%;width:100%};
 
+div.AP_DAJS_element.sirImg.easterEgg {will-change:transform, opacity;}
+
+
 .invisible{ display:none; }
 
-body[AP_DAJS_pagetype=astropair] div.bottomdiv {position:absolute;bottom:5px;left:5px;}
+body[AP_DAJS_pagetype=astropair] div.bottomdiv {position:absolute;left:5px;bottom:-55px;}
 body[AP_DAJS_pagetype=pair] h3 > a > i, body[AP_DAJS_pagetype=astropair] #header > app-token-info > div > div.icons-list > a.coingecko.ng-star-inserted {background:#FFFF00 !important;}
 
 #header > app-token-info > div > div.icons-list > a > img
@@ -1395,17 +1421,17 @@ content:'\\f0b0';
 }
 
 
-.popover-body{ padding: .5rem .75rem .5rem .5rem;
+.popover-body{ padding: .5rem .75rem .5rem .5rem !important;
 
  }
 
-.popover-body a,.popover-body a:hover {line-height: 12px; !important;color:#00b8d8;font-size: 12px;z-index:99999;}
+.popover-body a,.popover-body a:hover {line-height: 12px; !important;color:#00b8d8;font-size: 12px;z-index:99999; }
 .popover-body a:not(.makeBold) {font-weight:normal;}
 
 .popover{ box-shadow: 0 3px 15px rgba(90,97,105,.15), 0 2px 3px rgba(90,97,105,.25),0px 3px 6px 3px rgba(16,75,95,0.25) !important;
         -webkit-box-shadow: 0 3px 15px rgba(90,97,105,.15), 0 2px 3px rgba(90,97,105,.25),0px 3px 6px 3px rgba(16,75,95,0.25) !important;
         -moz-box-shadow: 0 3px 15px rgba(90,97,105,.15), 0 2px 3px rgba(90,97,105,.25),0px 3px 6px 3px rgba(16,75,95,0.25) !important;
-z-index:99999;font-size:12px !important;line-height:14px;}
+z-index:99999;font-size:12px !important;line-height:14px !important}
 
 .sorting {text-decoration:underline;}
 
@@ -1503,7 +1529,7 @@ font-weight:bold;
 font-size:15px;
 padding: 0 2px 6px 0;}
 
-.ethpImg { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAbCAYAAACX6BTbAAADQElEQVRIDbVVSyh8cRgdzxmEjEZSRpSFopHMXoYVhUQWyoKFzaTYeDQWNhb2NAtjQ1EzFqwpSSmSspFHI4+FPEfehvPvfLmaO3PvHYu/X93mzr2/73zn933nfNeEP1ymP8TGr8Gfn59xfn6Oq6srhMPhX3GKC/719YXX11csLS2hu7sbg4OD2N3d/T/g7+/v2N/fR319PdLS0lBYWIj+/n6EQqG4CQyZf35+4vr6GuPj47BarTCZTEhJSUF1dTVWVlbA90bLEPzx8RGbm5soKSlBcnIyEhMT5crJyUFTUxNubm4ME+iCk9XBwQG6uroEmIyZhGVhkoKCAni9XpCA3tIFv7y8xOzsLGw2GxISEuBwODA9PQ2PxwMyt1gsqKysxM7ODt7e3jTxNcG5eW1tDTU1NcI6MzMTIyMjOD09lTK1tbXJ8/T0dLjdbpydnYGqil6a4EdHRxgeHkZWVpYopK6uDnt7e6ByWOeFhQUUFRXJiUpLSzE3N4eHh4do7FgTsYbz8/MoLy8XZRQXF0t5lNqyF0w+MDAAs9mM1NRUNDY2YmtrK8ZcKuYMpEGam5ulpqx3Z2enaDpSdnTr9vY2qqqqhEB+fr70gu6NXCpwshsdHUVeXp4EOZ1OqXEksBJ8f3+PqakpaS4bTu2zXJFLBX58fIza2lo5bnZ2NlpaWqTGWs0ie3qANac07XY7xsbGIrHVNX96esLk5KRspGkYSC1/fHyogvj/5OREPJCRkSF1Z9NXV1dV+1TMyfDw8BB9fX1idwayNOvr63h5efkJvLi4EBIcCUlJSaioqIDP54uZNypwRlNuGxsbaG1tlaZSjh0dHeJWvru7u8Py8rIActawP0NDQ+KBn+zfNzHgfM6J5/f7RY5kRkey0cFgUBK3t7dLw+lS3nNqas14TXAm4IeBasjNzRWzlJWVYWJiQhzJ0xCYXoguWSR7XXDKj4Orp6dHWFIRBOUo4GmojpmZGVAEeksXnAFsIm3PptKJ1DMvmqa3t1cmopZMlWSG4AzkzAgEAjJLyJjMGxoa5FRGwExgCM4NLI/yNWKNXS6XOFFvzCqsfwWubKb+FxcX5fN2e3urPDb8jcvcMDrOyz8F/wef3Sw2f5ic6QAAAABJRU5ErkJggg==)
+.ethpImg { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAvCAYAAABkBQNlAAAFTklEQVRYCe1Ya0hjVxCOxmjiIz6qEu3GaGrUGBEkxEd8bjYa9Ud9gDU0aAyKGvwjuuKDIJeoKL6iIMotaNEilFRZloQgUpp/UkqQ9UeKlNJIoSz9sRRkEVmQU6aQ7L0n1xizUfpDQe45586Z+eY7M3PmhsV6+nti4IkBZgb6+/sTGxoaZgiCSGGWeORVqVSawWazr1ksFoqIiHiv0+n4jwyBbo4giHg+n/8eAHn/eTze7wRBRNElH2mGEIoUCASnkZGRPkBeYNXV1d+xWKyIR4Ly0YxerzdFR0f7AQJgXC4XGQyGlo/SjzA6ODiQJCQkQAwxgoL13NxctLGx8dkjwGGxnE5nVFVV1V/eo7rtCSy+ePHiDRzzgwObnZ2d4vF4fgzFxcUh/DhTU1PR4OCg8UFBORyOZ/n5+X6AcnJyUF9fHyouLqa9Y7PZSCqVIqvVKngQYHAMer3+VzzbwPDExITL4/Fwh4eHX6elpdGAxcbGIo1Gc4oQCn82rq+v6wUCAc0gxFNFRcWH8/PzBGDCarVGNzc3vwWg1FhLSUlBc3NzX4WVLbvdnqxSqWiGIMP4fD7a3t5+TjVmsViyJRIJTTYqKgrl5+ffuN3ueKpsyGOgfWRk5Ec4Bqr3wEZHR8f3TEXSaDSOQOBT5SEJuru7fwgZCHUjSZLPCwsLaQYAUHZ29vXJyQmPKusdQ/wplcrfqKCAWcja/f19uVcupKfD4Yhpa2u7ohZJGCclJSGTyaQKpHRlZUUIsUQFBuPKysp3UOsC7Q34bnx8fA1qDVVxTEwMUiqVx8Fkk1arNeNBD7rMZrMpoOHbXh4eHooUCgUNELAkFouh7gTVN5EkyREKhf9QnYJxZmYmOjo6yrjNNuM6sNDa2vqGw+HQQCUmJqKurq57eWk2myvx2gbAOjs7XcGw7QM4NjZWzVSTysrK0NnZWZxPMIgBGC4vL/8FZwscXltb+zIIFSwWQRCRxcXFb3Hv4CqZn5+3BaUEE7LZbBKcdQApFos/kCQZi4n7T/v7+wvwrAGALS0tyOPxDPjvuHsF2KqtrfVrdQDo5ubm7p0ajEajGgcFXpWWliK73f7yTgUMAi6XKyMjI4MR1NbW1jcMW+hLLpeLU1JS4nd8cKV0dnZe3Cs4wRuEIrRa7TFTaVCr1X8GXbN2dnaEMpnMzzPwdmJiooTuRuDZzMyMCootHuhFRUVod3f388C7sbfT09M6kUhEUwbe5uXl/Q31BxNnnNpsttiCgoL/Pr+ooJKTk9HS0tLXjJsCLQLtPT09r6A2URXCR4FSqfyW6SKm6oP9TU1Nx9S9MIak6e3tfX3fMPDphrtPrVa/g9aDqhw6hu7u7oCeDg0N9eGdBegoLy+/dDqdXJ+RUAYkSX6Bdwlw3UBrsrq6KmPSubi4KBEKhTRHgCGIyb29PSnTnnuvmUymAfxiBmBZWVnX0ABSFVqtVl5ZWdkllVmQhU+y0dHRUarsJ43h/HU63RF0CFRjMG5sbLxwu93RYABug7a2tp/w9Ic4rK+v/znsn1vQ0Mnl8kvwGgc2OTl5BIAGBgZe4ukP8SiTya6dTmd4WmGcXogHSGccFBTWurq6U7yEgAOwtry8/GndJg4En09NTQ3hx4OD9M6BNb1eH744wsF45xBfKpXqldfwbU8ArtFoQq9HXoPBPuF+TE9Pv2CKLy9IhULxB8gFqzMschaLJYnL5V55QVCfIpHoamFhITEshu6rpL29/RmPx7uhAuJwODcGg0F4X11hlReLxVlsNtvHWE1NjSSsBkJV1tHRES+Xy009PT0P8+tKqMCe9v0fGPgXBV63pJavPvQAAAAASUVORK5CYII=)
 !important;}
 
 .gearImgOLDtriangle{ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAATCAYAAACUef2IAAAA+klEQVQ4Ea1UPQ7CIBTmDAYYjKPRA7kZB2dPYRy0j/QOzo48ooOJ8QSewiuoqwYsCYW2vEabNPC+P74ylDHiw5UBXpg5UU6XCcC3fekOglIoXPpgsdNjgoUmqULPPpzmyqgE4C28AruXgKuMLU/HLeM5n9CgaAtxuMJrg4UGVcGHWC0AX5aLcdLc1tabc7zX1Va+PU6skYOe1ohgEAXue7emtqHqXB8JpqQ2kYVeWO0ATqPgY5q3vVowxkh6AfigtvW1hqXh1iMVzjyWrN/T9T0hMkBn604yE2xp51eIidQSCdgDkKDXSYZv+6/V9Qku//Jj8NP/CSWYzQe4WOyxcf17xQAAAABJRU5ErkJggg==)
@@ -1559,7 +1585,19 @@ overflow: hidden !important;
   -ms-animation: animationFrames linear .5s;
   -ms-animation-iteration-count: 1;
   -ms-transform-origin: 50% 50%;
-translateZ(0)
+translateZ(0);
+-webkit-backface-visibility: hidden;
+-webkit-perspective: 1000;
+-moz-backface-visibility: hidden;
+-moz-perspective: 1000;
+-o-backface-visibility: hidden;
+-o-perspective: 1000;
+-ms-backface-visibility: hidden;
+-ms-perspective: 1000;
+backface-visibility: hidden;
+perspective: 1000;
+
+
 }
 
 @keyframes animationFrames{
@@ -1651,6 +1689,130 @@ translateZ(0)
  overflow: hidden;
  }
 }
+
+
+
+.AP_DAJS_popover.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1060;
+  display: none;
+  max-width: 276px;
+  padding: 1px;
+  text-align: left;
+  white-space: normal;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 6px !important;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+.AP_DAJS_popover.popover.top {
+  margin-top: -10px;
+}
+.AP_DAJS_popover.popover.right {
+  margin-left: 10px;
+}
+.AP_DAJS_popover.popover.bottom {
+  margin-top: 10px;
+}
+.AP_DAJS_popover.popover.left {
+  margin-left: -10px;
+}
+.AP_DAJS_popover.popover-title {
+  padding: 8px 14px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0;
+}
+.AP_DAJS_popover.popover-content {
+  padding: 9px 14px;
+}
+.AP_DAJS_popover.popover > .arrow,
+.AP_DAJS_popover.popover > .arrow:after {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+.AP_DAJS_popover.popover > .arrow {
+  border-width: 11px;
+}
+.AP_DAJS_popover.popover > .arrow:after {
+  content: "";
+  border-width: 10px;
+}
+.AP_DAJS_popover.popover.top > .arrow {
+  bottom: -11px;
+  left: 50%;
+  margin-left: -11px;
+  border-top-color: #999;
+  border-top-color: rgba(0, 0, 0, .25);
+  border-bottom-width: 0;
+}
+.AP_DAJS_popover.popover.top > .arrow:after {
+  bottom: 1px;
+  margin-left: -10px;
+  content: " ";
+  border-top-color: #fff;
+  border-bottom-width: 0;
+}
+.AP_DAJS_popover.popover.right > .arrow {
+  top: 50%;
+  left: -11px;
+  margin-top: -11px;
+  border-right-color: #999;
+  border-right-color: rgba(0, 0, 0, .25);
+  border-left-width: 0;
+}
+.AP_DAJS_popover.popover.right > .arrow:after {
+  bottom: -10px;
+  left: 1px;
+  content: " ";
+  border-right-color: #fff;
+  border-left-width: 0;
+}
+.AP_DAJS_popover.popover.bottom > .arrow {
+  top: -11px;
+  left: 50%;
+  margin-left: -11px;
+  border-top-width: 0;
+  border-bottom-color: #999;
+  border-bottom-color: rgba(0, 0, 0, .25);
+}
+.AP_DAJS_popover.popover.bottom > .arrow:after {
+  top: 1px;
+  margin-left: -10px;
+  content: " ";
+  border-top-width: 0;
+  border-bottom-color: #fff;
+}
+.AP_DAJS_popover.popover.left > .arrow {
+  top: 50%;
+  right: -11px;
+  margin-top: -11px;
+  border-right-width: 0;
+  border-left-color: #999;
+  border-left-color: rgba(0, 0, 0, .25);
+}
+.AP_DAJS_popover.popover.left > .arrow:after {
+  right: 1px;
+  bottom: -10px;
+  content: " ";
+  border-right-width: 0;
+  border-left-color: #fff;
+}
+
 ` );
                  /* note: translateZ(0) supposedly iproves css anim performance by forcing creation of a separate layer. */
 
