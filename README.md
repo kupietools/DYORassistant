@@ -2,7 +2,7 @@
 
 ### _2.) I've been unbanned from Telegram, if you knew about that. Still deciding whether I want to stay with that platform, but for the moment, the announcement channel is still [http://t.me/ApopheniaProjects](http://t.me/ApopheniaProjects). If that changes it will be posted here._
 
-### _3.) Following questions, I've found an intro to userscripts for beginners at [https://openuserjs.org/about/Userscript-Beginners-HOWTO](https://openuserjs.org/about/Userscript-Beginners-HOWTO). Remember, as this software is shared for free I don't have the resources to provide training or support, but that link might help newbies get going. People in the Discussion channel linked from the Telegram announcement channel might be able to provide some help, too._
+### _3.) Following questions, I've found an intro to userscripts for beginners at [https://openuserjs.org/about/Userscript-Beginners-HOWTO](https://openuserjs.org/about/Userscript-Beginners-HOWTO). Remember, as this software is shared for free I don't have the resources to provide training or support, but that link might help newbies get going. People in the Discussion channel linked from the Telegram [http://t.me/ApopheniaProjects](announcement channel) might be able to provide some help, too._
 
 ### _4.) A new version with scads of new features is under heavy development and will be posted soon. Sooooooooon. Keep watching the skies._
 
