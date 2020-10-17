@@ -4,7 +4,7 @@
 
 ### _3.) Following questions, I've found an intro to userscripts for beginners at [https://openuserjs.org/about/Userscript-Beginners-HOWTO](https://openuserjs.org/about/Userscript-Beginners-HOWTO). Remember, as this software is shared for free I don't have the resources to provide training or support, but that link might help newbies get going. People in the Discussion channel linked from the Telegram announcement channel might be able to provide some help, too._
 
-### _4.) A new version is under heavy development and will be posted soon. Sooooooooon. Keep watching the skies._
+### _4.) A new version with scads of new features is under heavy development and will be posted soon. Sooooooooon. Keep watching the skies._
 
 # DYORassistant (formerly "DEXTassistant")
 
