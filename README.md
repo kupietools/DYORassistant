@@ -11,7 +11,7 @@
 An independently developed userscript bringing new UI features and embedded research tools to popular DEX- &
 DeFi-related websites, to give you an edge and help avoid scams. 
 
-# QUICK FAQ for those who don't want to read this whole README
+## Foreword: FAQ for those who don't want to read this whole README
 
 Q1.) Can you just tell me how to install and/or use this, instead of me having to read this whole README and think and stuff? 
 
