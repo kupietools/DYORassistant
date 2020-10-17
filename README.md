@@ -11,6 +11,14 @@
 An independently developed userscript bringing new UI features and embedded research tools to popular DEX- &
 DeFi-related websites, to give you an edge and help avoid scams. 
 
+# QUICK FAQ for those who don't want to read this whole README
+
+Q1.) Can you just tell me how to install and/or use this, instead of me having to read this whole README and think and stuff? 
+
+A1.) No, sorry.  
+
+End of FAQ.
+
 # BACKGROUND
 
 ## I. Origins
@@ -78,8 +86,10 @@ answers yourself. I'm grouchy, don't bother me.
 
 ## The murky depths from whence this came
 
-This is an independent project that bubbled up out of a single developer's needs. It's not affiliated
-with DEXTools.io or its development team in any way, please *never bother them with questions about it*.
+This is an independent project that bubbled up out of a single developer's need, provided gratis for 
+anyone who might be able to make use of it. It's not affiliated with DEXTools.io or its development 
+team, (or any other website or development team) in any way. Please *never bother them with questions 
+about it*. 
 
 ## In not so many words:
 
