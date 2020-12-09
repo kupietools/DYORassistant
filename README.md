@@ -1,4 +1,4 @@
-### _CURRENT-ER NEWS, DEC 8: Hi. I'm alive and so is the project. However, life got very hectic for a while. I will be back to resume development once everything calms down. You can email dyora1220@apopheniapays.com with questions in the meantime. 
+### CURRENT-ER NEWS, DEC 8: Hi. I'm alive and so is the project. However, life got very hectic for a while. I will be back to resume development once everything calms down. You can email dyora1220@apopheniapays.com with questions in the meantime. 
 
 ## _CURRENT NEWS, Oct 16: 1.) This script is in a bit of a state of transition, as it no longer fully works with DEXTools following their switch to a different toolbox under-the-hood, but I haven't yet finished adapting it to be fully functional on Astrotools.io or the other sites I want it to work with. I should have it sorted in a few days, hopefully._ 
 
