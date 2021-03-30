@@ -1,4 +1,4 @@
-### CURRENT-ER NEWS, DEC 8: Hi. I'm alive and so is the project. However, life got very hectic for a while. I will be back to resume development once everything calms down. You can email dyora1220@apopheniapays.com with questions in the meantime. 
+### _"I'M NOT DEAD YET!"_ Mar 30: Hi. I'm alive and so is the project. I got out of DeFi afew months ago following substantial trading losses, so this project is kind of dormant until I'm ready to get back into trading crypto again. That day WILL come, but I don't know when yet, and I'll resume development at that point. I still have plenty of ideas and enthusiasm for eventually making this an indispensable tool. You can email dyora321@apopheniapays.com with questions in the meantime. Be well! 
 
 ## _CURRENT NEWS, Oct 16: 1.) This script is in a bit of a state of transition, as it no longer fully works with DEXTools following their switch to a different toolbox under-the-hood, but I haven't yet finished adapting it to be fully functional on Astrotools.io or the other sites I want it to work with. I should have it sorted in a few days, hopefully._ 
 
