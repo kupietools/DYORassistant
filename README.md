@@ -1,4 +1,4 @@
-### _"It's not dead, it's just resting!"_ Jun 10 2021: Still alive. High gas fees, as well as much better success trading stocks & options than crypto, have kept me away. So this project lays in a persistent vegetative state, not dead but not truly alive, missed by its loved ones but otherwise ignored by the all-too-short memories of a world that has moved on. I will be back to revive this, I am sure this is not over, but exactly when is anybody's guess. Probably when ETH2 makes gas cheaper and/or the traditional finance market doesn't have as many opportunities as it does now. Stay tuned, and do feel free to follow on twitter where I never see my DMs or replies at @apopheniapays or drop me a line at [any_address,_try_to_amuse_me]@apopheniapays.com. 
+### _"It's not dead, it's just resting!"_ Jun 10 2021: Still alive. High gas fees, as well as much better success trading stocks & options than crypto, have kept me away. So this project lays in a persistent vegetative state, not dead but not truly alive, missed by its loved ones but otherwise ignored by the all-too-short memories of a world that has moved on. I will be back to revive this, I am sure this is not over, but exactly when is anybody's guess. Probably when ETH2 makes gas cheaper and/or the traditional finance market doesn't have as many opportunities as it does now. Stay tuned, and do feel free to drop me a line at DYORassistant@kupietz.com. 
 
 ### _"I'M NOT DEAD YET!"_ Mar 30: Hi. I'm alive and so is the project. I got out of DeFi afew months ago following substantial trading losses, so this project is kind of dormant until I'm ready to get back into trading crypto again. That day WILL come, but I don't know when yet, and I'll resume development at that point. I still have plenty of ideas and enthusiasm for eventually making this an indispensable tool. You can email dyora321@apopheniapays.com with questions in the meantime. Be well! 
 
@@ -193,3 +193,10 @@ may begin asking for read-only permission to connect to your wallet (exactly as 
 qualify for the premium-level subscriptions to some popular websites, such as holding 20k DEXT for DEXTools 2nd-tier subscription
 or holding enough TRND to qualify for Trendering's exclusive 300-member telegram, you may be prevented from further use of this
 script. If you wish to avoid these restrictions you may wish not to upgrade the script.
+
+# I am
+Michael E. Kupietz, software engineering, consulting, & support for FileMaker Pro, Full-Stack Web, Desktop OS, & TradingView platforms  
+https://kupietz.com (Business info)  
+https://github.com/kupietools (Free software)  
+https://michaelkupietz.com (Personal & creative showcase)  
+
