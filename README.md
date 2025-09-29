@@ -1,6 +1,6 @@
 ### _"It's not dead, it's just resting!"_ Jun 10 2021: Still alive. High gas fees, as well as much better success trading stocks & options than crypto, have kept me away. So this project lays in a persistent vegetative state, not dead but not truly alive, missed by its loved ones but otherwise ignored by the all-too-short memories of a world that has moved on. I will be back to revive this, I am sure this is not over, but exactly when is anybody's guess. Probably when ETH2 makes gas cheaper and/or the traditional finance market doesn't have as many opportunities as it does now. Stay tuned, and do feel free to drop me a line at DYORassistant@kupietz.com. 
 
-### _"I'M NOT DEAD YET!"_ Mar 30: Hi. I'm alive and so is the project. I got out of DeFi afew months ago following substantial trading losses, so this project is kind of dormant until I'm ready to get back into trading crypto again. That day WILL come, but I don't know when yet, and I'll resume development at that point. I still have plenty of ideas and enthusiasm for eventually making this an indispensable tool. You can email dyora321@apopheniapays.com with questions in the meantime. Be well! 
+### _"I'M NOT DEAD YET!"_ Mar 30: Hi. I'm alive and so is the project. I got out of DeFi afew months ago following substantial trading losses, so this project is kind of dormant until I'm ready to get back into trading crypto again. That day WILL come, but I don't know when yet, and I'll resume development at that point. I still have plenty of ideas and enthusiasm for eventually making this an indispensable tool. Be well! 
 
 ## _CURRENT NEWS, Oct 16: 1.) This script is in a bit of a state of transition, as it no longer fully works with DEXTools following their switch to a different toolbox under-the-hood, but I haven't yet finished adapting it to be fully functional on Astrotools.io or the other sites I want it to work with. I should have it sorted in a few days, hopefully._ 
 
@@ -126,12 +126,12 @@ myself, on Firefox, Brave, and Chrome, so I know for sure that this script works
 need to decide for yourself which userscript manager is right for you. Consult your doctor.)
 
 *BONUS!* For users that already have a userscript manager extension installed in their browser, you can
-install DextAssistant simply by clicking this link: [https://github.com/ApopheniaPays/dextassistant/raw/master/dextAssistant.user.js](https://github.com/ApopheniaPays/dextassistant/raw/master/dextAssistant.user.js).
+install DYORassistant simply by clicking this link: [https://github.com/kupietools/DYORassistant/raw/master/DYORassistant.user.js](https://github.com/kupietools/DYORassistant/raw/master/DYORassistant.user.js).
 
-This script is also hosted at [https://openuserjs.org/scripts/ApopheniaPays/DextAssistant](https://openuserjs.org/scripts/ApopheniaPays/DextAssistant)
+<!-- This script is also hosted at [https://openuserjs.org/scripts/ApopheniaPays/DextAssistant](https://openuserjs.org/scripts/ApopheniaPays/DextAssistant)
 for one-click install if you prefer to get a minified version. Supposedly that will stay current as I update
 it here, but I haven't checked.
-
+-->
 ## Features
 
 Global enhancements (currently works on DEXTools.io, Astrotools.io, Trendering.com, Etherscan.io, and Unitradebeta.com):
